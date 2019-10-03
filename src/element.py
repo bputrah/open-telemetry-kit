@@ -2,53 +2,54 @@
 
 import logging
 from abc import abstractmethod
+from typing import Any, Set
 
 class Element():
-  def __init__(self, value):
+  def __init__(self, value: Any):
     self.value = value
 
-  def __repr__(self):
+  def __repr__(self) -> str:
     return '{}({})'.format(self.__class__.__name__, self.value)
 
   @property
   @classmethod
   @abstractmethod
-  def name(self):
+  def name(self) -> str:
     pass
 
   @property
   @classmethod
   @abstractmethod
-  def names(self):
+  def names(self) -> Set[str]:
     pass
 
-  def toJson(self):
+  def toJson(self) -> Any:
     return self.value
 
 class ChecksumElement(Element):
   name = "checksum"
   names = {"checksum", "Checksum"}
 
-  def __init__(self, value):
+  def __init__(self, value: int):
     self.value = value
   
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(int(value))
 
 class TimestampElement(Element):
   name = "timestamp"
   names = {"timestamp", "Timestamp", "time stamp", "Time Stamp"}
 
-  def __init__(self, value):
+  def __init__(self, value: int):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(int(float(value))) ##float() can handle scientific notation. So convert to float to be safe, then to int
 
   @classmethod
-  def fromSRT(cls, value):
+  def fromSRT(cls, value: str) -> Element:
     return cls(int(value))
   
 class MissionIDElement(Element):
@@ -56,11 +57,11 @@ class MissionIDElement(Element):
   names = {"missionID", "MissionId", "Missionid", "missionID",
            "missionId", "missionid"}
 
-  def __init__(self, value):
+  def __init__(self, value: str):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(value)
   
 class PlatformHeadingAngleElement(Element):
@@ -69,11 +70,11 @@ class PlatformHeadingAngleElement(Element):
            "headingAngle", "HeadingAngle", "headingangle", "Heading Angle",
            "heading angle", "heading", "Heading"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class PlatformPitchAngleElement(Element):
@@ -82,11 +83,11 @@ class PlatformPitchAngleElement(Element):
            "pitchAngle", "PitchAngle", "pitchangle", "Pitch Angle", "pitch angle",
            "pitch", "Pitch"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class PlatformRollAngleShortElement(Element):
@@ -95,11 +96,11 @@ class PlatformRollAngleShortElement(Element):
            "rollAngleShort", "RollAngleShort", "rollangleshort", "Roll Angle Short",
            "roll angle short", "roll short", "Roll Short"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class PlatformRollAngleFullElement(Element):
@@ -108,11 +109,11 @@ class PlatformRollAngleFullElement(Element):
            "rollAngleFull", "RollAngleFull", "rollanglefull", "Roll Angle Full",
            "roll angle full", "roll full", "Roll Full"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class PlatformDesignationElement(Element):
@@ -120,11 +121,11 @@ class PlatformDesignationElement(Element):
   names = {"platformDesignation", "PlatformDesignation", "platformdesignation",
            "Platform Designation", "platform designation", "platform", "model"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class ImageSourceSensorElement(Element):
@@ -133,11 +134,11 @@ class ImageSourceSensorElement(Element):
            "Image Source Sensor", "image source sensor", "Image Source", 
            "image source", "Source Sensor", "source sensor"}
 
-  def __init__(self, value):
+  def __init__(self, value: str):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(value)
   
 class ImageCoordinateSystemElement(Element):
@@ -146,11 +147,11 @@ class ImageCoordinateSystemElement(Element):
            "Image Coordinate System", "image coordinate system", "Coordinate System",
            "coordinate system"}
 
-  def __init__(self, value):
+  def __init__(self, value: str):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(value)
   
 class LatitudeElement(Element):
@@ -158,15 +159,15 @@ class LatitudeElement(Element):
   names = {"Latitude", "latitude", "sensorLatitude", "SensorLatitude", "sensorlatitude",
            "Sensor Latitude", "sensor latitude", "Lat", "lat", "LATITUDE", "LAT"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
   @classmethod
-  def fromSRT(cls, value):
+  def fromSRT(cls, value: str) -> Element:
     return cls(float(value))
 
 class LongitudeElement(Element):
@@ -175,15 +176,15 @@ class LongitudeElement(Element):
            "sensorlongitude", "Sensor Longitude", "sensor longitude", "Long", "long",
            "LONG", "Lon", "lon", "LON", "longtitude"} #DJI can't spell
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
 
   @classmethod
-  def fromSRT(cls, value):
+  def fromSRT(cls, value: str) -> Element:
     return cls(float(value))
   
 class AltitudeElement(Element):
@@ -192,15 +193,15 @@ class AltitudeElement(Element):
            "sensortruealtitude", "Sensor True Altitude", "sensor true altitude",
            "ALT", "Alt", "alt", "Altitude (m)"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
   @classmethod
-  def fromSRT(cls, value):
+  def fromSRT(cls, value: str) -> Element:
     return cls(float(value))
 
 class SensorEllipsoidHeightElement(Element):
@@ -208,11 +209,11 @@ class SensorEllipsoidHeightElement(Element):
   names = {"sensorEllipsoidHeight", "SensorEllipsoidHeight", "sensorellipsoidheight",
            "Sensor Ellipsoid Height", "sensor ellipsoid heigt"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class SensorEllipsoidHeightExtendedElement(Element):
@@ -221,11 +222,11 @@ class SensorEllipsoidHeightExtendedElement(Element):
            "sensorellipsoidheightextended", "Sensor Ellipsoid Height Extended",
            "sensor ellipsoid heigt extended"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class SensorHorizontalFOVElement(Element):
@@ -234,11 +235,11 @@ class SensorHorizontalFOVElement(Element):
            "Sensor Horizontal FOV", "sensor horizontal FOV", "sensor horizontal fov",
            "Horizontal FOV", "horizontal FOV", "horizontal fov", "Horizontal FOV (deg)"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class SensorVerticalFOVElement(Element):
@@ -247,11 +248,11 @@ class SensorVerticalFOVElement(Element):
            "Sensor Vertical FOV", "sensor vertical FOV", "sensor vertical fov",
            "Vertical FOV", "vertical FOV", "vertical fov", "Vertical FOV (deg)"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class SensorRelativeAzimuthAngleElement(Element):
@@ -261,11 +262,11 @@ class SensorRelativeAzimuthAngleElement(Element):
            "sensor relative azimuth angle", "azimuthAngle", "AzimuthAngle",
            "azimuthangle", "Azimuth Angle", "azimuth angle", "Pan", "pan", "Pan (deg)"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class SensorRelativeElevationAngleElement(Element):
@@ -274,11 +275,11 @@ class SensorRelativeElevationAngleElement(Element):
            "sensorrelativeelevationangle", "Sensor Relative Elevation Angle",
            "sensor relative elevation angle", "Tilt", "tilt", "Tilt (deg)"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class SensorRelativeRollAngleElement(Element):
@@ -287,11 +288,11 @@ class SensorRelativeRollAngleElement(Element):
            "sensorrelativerollangle", "Sensor Relative Roll Angle",
            "sensor relative roll angle", "Roll", "roll", "Roll (deg)"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class SlantRangeElement(Element):
@@ -299,11 +300,11 @@ class SlantRangeElement(Element):
   names = {"slantRange", "SlantRange", "slantrange", "Slant Range", "slant range",
            "Slant Range (m)"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class TargetWidthElement(Element):
@@ -311,11 +312,11 @@ class TargetWidthElement(Element):
   names = {"targetWidth", "TargetWidth", "targetwidth", "Target Width", "target width",
            "Horizontal Span (m)"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class TargetWidthExtendedElement(Element):
@@ -323,11 +324,11 @@ class TargetWidthExtendedElement(Element):
   names = {"targetWidthExtended", "TargetWidthExtended", "targetwidthextended",
            "Target Width Extended", "target width extended"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class FrameCenterLatitudeElement(Element):
@@ -336,11 +337,11 @@ class FrameCenterLatitudeElement(Element):
            "Frame Center Latitude", "frame center latitude", "Center Latitude",
            "center latitude"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class FrameCenterLongitudeElement(Element):
@@ -349,11 +350,11 @@ class FrameCenterLongitudeElement(Element):
            "Frame Center Longitude", "frame center longitude", "Center Longitude",
            "center longitude"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class FrameCenterElevationElement(Element):
@@ -362,11 +363,11 @@ class FrameCenterElevationElement(Element):
            "Frame Center Altitude", "frame center altitude", "Center Altitude",
            "center altitude", "Center Altitude (m)"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class FrameCenterHeightAboveEllipsoidElement(Element):
@@ -375,11 +376,11 @@ class FrameCenterHeightAboveEllipsoidElement(Element):
            "framecenterheightaboveellipsoid", "Frame Center Height Above Ellipsoid",
            "frame center height above ellipsoid"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class UASLocalSetVersionElement(Element):
@@ -387,11 +388,11 @@ class UASLocalSetVersionElement(Element):
   names = {"UASLocalSetVersion", "uaslocalsetversion", "UAS Local Set Version",
            "uas local set version"}
 
-  def __init__(self, value):
+  def __init__(self, value: int):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(int(value))
   
 #Not sure what to make of this class
@@ -400,11 +401,11 @@ class MotionImageryCoreIdentifierElement(Element):
   name = "motionImageryCoreIdentifier"
   names = {"motionImageryCoreIdentifier"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class SensorWGS84AltitudeElement(Element):
@@ -412,11 +413,11 @@ class SensorWGS84AltitudeElement(Element):
   names = {"sensorWGS84Altitude", "SensorWGS84Altitude", "sensorWGS84altitude",
            "sensortwgs64altitude"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class SensorGroundAltitudeElement(Element):
@@ -424,11 +425,11 @@ class SensorGroundAltitudeElement(Element):
   names = {"sensorGroundAltitude", "SensorGroundAltitude", "sensorgroundaltitude",
            "Sensor Ground Altitude", "sensor ground altitude"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class SensorLaunchAltitudeElement(Element):
@@ -436,11 +437,11 @@ class SensorLaunchAltitudeElement(Element):
   names = {"sensorLaunchAltitude", "SensorLaunchAltitude", "sensorlaunchaltitude",
            "Sensor Launch Altitude", "sensor launch altitude"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
   
 class TimeframeBeginElement(Element):
@@ -448,15 +449,15 @@ class TimeframeBeginElement(Element):
   names = {"timeframeBegin", "TimeframeBegin", "timeframebegin", "Timeframe Begin",
            "timeframe begin"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
 
   @classmethod
-  def fromSRT(cls, value):
+  def fromSRT(cls, value: str) -> Element:
     return cls(float(value))
   
 class TimeframeEndElement(Element):
@@ -464,20 +465,20 @@ class TimeframeEndElement(Element):
   names = {"timeframeEnd", "TimeframeEnd", "timeframeend", "Timeframe End",
            "timeframe end"}
 
-  def __init__(self, value):
+  def __init__(self, value: float):
     self.value = value
 
   @classmethod
-  def fromCSV(cls, value):
+  def fromCSV(cls, value: str) -> Element:
     return cls(float(value))
 
   @classmethod
-  def fromSRT(cls, value):
+  def fromSRT(cls, value: str) -> Element:
     return cls(float(value))
   
 class UnknownElement(Element):
   name = "unknown"
   names = {}
 
-  def __init__(self, value):
+  def __init__(self, value: str):
     self.value = value

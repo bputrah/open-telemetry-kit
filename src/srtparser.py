@@ -20,23 +20,25 @@ import pandas as pd
 import re
 
 from parser import Parser
-from flightpath import FlightPath
+from telemetry import Telemetry
 from packet import Packet
 import element
-# from elementdict import element_dict
+
+from element import Element
+from typing import Dict
 
 class SRTParser(Parser):
-  ext = ".srt"
+  ext = "srt"
 
-  def __init__(self, source):
+  def __init__(self, source: str):
     self.source = source
     self.element_dict = {}
     for cls in element.Element.__subclasses__():
       for name in cls.names:
         self.element_dict[name] = cls
 
-  def read(self):
-    fp = FlightPath()
+  def read(self) -> Telemetry:
+    tel = Telemetry()
     with open(self.source, 'r') as src:
       # read block
       block = ""
@@ -51,14 +53,14 @@ class SRTParser(Parser):
           self._extractTimestamp(block[sec_line_end + 1 :], packet)
           # search GPS
           self._extractData(block[sec_line_end + 1:], packet)
-          fp.append(packet)
+          tel.append(packet)
           block = ""
         else:
           block += line
 
-      return fp
+      return tel
 
-  def _extractTimeframe(self, line, packet):
+  def _extractTimeframe(self, line: str, packet: Dict[str, Element]):
     sep_pos = line.find("-->")
     tfb = pd.Timestamp(line[:sep_pos].strip())
     tfb = timedelta(hours=tfb.hour, minutes=tfb.minute, seconds=tfb.second, microseconds=tfb.microsecond).total_seconds()
@@ -67,7 +69,7 @@ class SRTParser(Parser):
     tfe = timedelta(hours=tfe.hour, minutes=tfe.minute, seconds=tfe.second, microseconds=tfe.microsecond).total_seconds()
     packet["timeFrameEnd"] = element.TimeframeBeginElement.fromSRT(tfe)
 
-  def _extractTimestamp(self, block, packet):
+  def _extractTimestamp(self, block: str, packet: Dict[str, Element]):
     # This should find any reasonably formatted (and some not so reasonably formatted) datetimes
     # 1+ digits, '/', '-', or '.', 1+ digits, the same separator previously found
     #   1+ digits, 1+ whitespace, 1+ digits, ':' 1+ digits,
@@ -88,7 +90,7 @@ class SRTParser(Parser):
       ts = int(pd.Timestamp(ts).to_pydatetime().timestamp() * 1000)
       packet["timestamp"] = element.TimestampElement.fromSRT(ts)
 
-  def _extractGPS(self, block, packet):
+  def _extractGPS(self, block: str, packet: Dict[str, Element]):
     gps_pos = block.find("GPS")
     end_line = block.find('\n', gps_pos)
 
@@ -114,16 +116,18 @@ class SRTParser(Parser):
     
     packet["Altitude"] = element.AltitudeElement.fromSRT(alt)
 
-  def _extractData(self, block, packet):
+  def _extractData(self, block: str, packet: Dict[str, Element]):
     if "GPS" in block:
-      self.extractGPS(block, packet)
+      self._extractGPS(block, packet)
     else:
-      #DJI wraps their metadata in [] find the first '[' and last ']'
+      # DJI wraps their telemetry in '[]' 
+      # find the first '[' and last ']'
       data_start = block.find('[')
       data_end = block.rfind(']')
       data = block[data_start : data_end]
-      #this will split on the common delimters found in DJIs srts and return a list
-      #list _should_ be alternating keyword, value
+      # This will split on the common delimters found in DJIs srts and return a list
+      # List _should_ be alternating keyword, value barring nothing weird from DJI
+      # which they have proven is not a safe assumption
       data = re.split(r"[\[\]\s:]+", data)
       if not data[0]: #remove empty string from regex search
         data.pop(0)

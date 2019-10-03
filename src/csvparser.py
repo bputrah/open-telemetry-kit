@@ -4,15 +4,15 @@ import csv
 import logging
 
 from parser import Parser
-from flightpath import FlightPath
+from telemetry import Telemetry
 from packet import Packet
 import element
 
 class CSVParser(Parser):
-  ext = ".csv"
+  ext = "csv"
 
-  def __init__(self, src):
-    self.__source = src
+  def __init__(self, src: str):
+    self.source = src
     self.element_dict = {}
     for cls in element.Element.__subclasses__():
       for name in cls.names:
@@ -22,18 +22,8 @@ class CSVParser(Parser):
     #TODO: figure out what the fuck I'm supposed to do here...
     pass
 
-  @property
-  def source(self):
-    return self.__source
-
-  @source.setter
-  def source(self, src):
-    #TODO: some sort of directory validation?
-    #logging.info("Creating new CSV Parser with source: %s", src)
-    self.__source = src
-
-  def read(self):
-    fp = FlightPath()
+  def read(self) -> Telemetry:
+    tel = Telemetry()
     with open(self.source, newline='') as csvfile:
       reader =  csv.DictReader(csvfile)
       for row in reader:
@@ -46,6 +36,6 @@ class CSVParser(Parser):
           else:
             packet[key] = element.UnknownElement(val)
         
-        fp.append(packet)
+        tel.append(packet)
 
-    return fp
+    return tel

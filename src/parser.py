@@ -1,12 +1,13 @@
 from abc import abstractmethod
+from telemetry import Telemetry
 
 class Parser():
   @property
   @classmethod
   @abstractmethod
-  def ext(self):
+  def ext(self) -> str:
     pass
 
   @abstractmethod
-  def read(self):
+  def read(self) -> Telemetry:
     pass

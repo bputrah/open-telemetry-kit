@@ -11,39 +11,53 @@
 # 2019-09-25 01:22:35,118,697
 # [iso : 110] [shutter : 1/200.0] [fnum : 280] [ev : 0.7] [ct : 5064] [color_md : default] [focal_len : 240] [latitude: 0.608553] [longtitude: -1.963763] [altitude: 1429.697998] </font>
 
-# Alternative GPS form:
-# GPS(-122.3699,37.5929,19) BAROMETER:64.3 (long, lat)
-# GPS(37.8757,-122.3061,0.0M) BAROMETER:36.9M (lat, long)
-
 from datetime import timedelta
 import pandas as pd
 import re
-
-from parser import Parser
-from telemetry import Telemetry
-from packet import Packet
-import element
-
-from element import Element
 from typing import Dict
+import os
+
+from .parser import Parser
+from .telemetry import Telemetry
+from .packet import Packet
+import open_telemetry_kit.element as element
+from .element import Element
+import open_telemetry_kit.detector as detector
 
 class SRTParser(Parser):
   ext = "srt"
 
-  def __init__(self, source: str):
+  def __init__(self, source: str, is_embedded: bool = False):
     self.source = source
     self.element_dict = {}
     for cls in element.Element.__subclasses__():
       for name in cls.names:
         self.element_dict[name] = cls
+    self.is_embedded = is_embedded
+    self.beg_timestamp = 0
+
+
+  def __str__(self):
+    #TODO: Implement me
+    pass
+
+  def __repr__(self):
+    #TODO: Implement me
+    pass
 
   def read(self) -> Telemetry:
+    if self.is_embedded:
+      path, _, _ = detector.split_path(self.source)
+      metadata = detector.read_video_metadata(os.path.join(path, "metadata.json"))
+      datetime = metadata["streams"][0]["tags"]["creation_time"]
+      self.beg_timestamp = int(pd.Timestamp(datetime).to_pydatetime().timestamp() * 1000)
+
     tel = Telemetry()
     with open(self.source, 'r') as src:
       # read block
       block = ""
       for line in src:
-        if line == '\n':
+        if line == '\n' and len(block) > 0:
           packet = Packet()
           sec_line_beg = block.find('\n') + 1
           sec_line_end = block.find('\n', sec_line_beg)
@@ -55,6 +69,8 @@ class SRTParser(Parser):
           self._extractData(block[sec_line_end + 1:], packet)
           tel.append(packet)
           block = ""
+        elif line == '\n':
+          continue
         else:
           block += line
 
@@ -64,13 +80,14 @@ class SRTParser(Parser):
     sep_pos = line.find("-->")
     tfb = pd.Timestamp(line[:sep_pos].strip())
     tfb = timedelta(hours=tfb.hour, minutes=tfb.minute, seconds=tfb.second, microseconds=tfb.microsecond).total_seconds()
-    packet["timeFrameBegin"] = element.TimeframeBeginElement.fromSRT(tfb)
+    packet["timeframeBegin"] = element.TimeframeBeginElement.fromSRT(tfb)
     tfe = pd.Timestamp(line[sep_pos+3:].strip())
     tfe = timedelta(hours=tfe.hour, minutes=tfe.minute, seconds=tfe.second, microseconds=tfe.microsecond).total_seconds()
-    packet["timeFrameEnd"] = element.TimeframeBeginElement.fromSRT(tfe)
+    packet["timeframeEnd"] = element.TimeframeBeginElement.fromSRT(tfe)
 
   def _extractTimestamp(self, block: str, packet: Dict[str, Element]):
     # This should find any reasonably formatted (and some not so reasonably formatted) datetimes
+    # Looks for:
     # 1+ digits, '/', '-', or '.', 1+ digits, the same separator previously found
     #   1+ digits, 1+ whitespace, 1+ digits, ':' 1+ digits,
     #   ':', 1+ digits, '.' or ',', any amount of whitespace, any number of digits, 
@@ -78,7 +95,7 @@ class SRTParser(Parser):
     ts = re.search(r"\d+([\/\-\.])\d+\1\d+\s+\d+:\d+:\d+([.,])?\s*\d*\2?\s*\d*", block)
 
     # pandas timestamp is pretty good, but can't handle the double microsecond separator 
-    # that sometimes shows up in DJIs stuff
+    # that sometimes shows up in DJIs telemetry so check to see if it exists and get rid of it
     # Also, convert to epoch microseconds while we're at it
     if ts:
       micro_syn = ts[2]
@@ -89,38 +106,50 @@ class SRTParser(Parser):
       
       ts = int(pd.Timestamp(ts).to_pydatetime().timestamp() * 1000)
       packet["timestamp"] = element.TimestampElement.fromSRT(ts)
+    
+    elif self.is_embedded and self.beg_timestamp != 0:
+      tfb = packet["timeframeBegin"].value
+      tfe = packet["timeframeEnd"].value
+      ts = 500 * (tfb+tfe) #average and convert to microseconds (sum * 1000/2)
+      packet["timestamp"] = element.TimestampElement.fromSRT(self.beg_timestamp + ts)
 
+  # Looks for GPS telemetry of the form:
+  # GPS(-122.3699,37.5929,19) BAROMETER:64.3 (long, lat) OR
+  # GPS(37.8757,-122.3061,0.0M) BAROMETER:36.9M (lat, long)
   def _extractGPS(self, block: str, packet: Dict[str, Element]):
     gps_pos = block.find("GPS")
-    end_line = block.find('\n', gps_pos)
+    gps_end = block.find(')', gps_pos)
+    end_line = block.find('\n', gps_end)
 
     val1_end = block.find(',', gps_pos)
     val1 = block[gps_pos+3 : val1_end] 
     val2_end = block.find(',', val1_end + 1)
     val2 = block[val1_end : val2_end]
     # lat, long
-    if 'M' == block[end_line - 1]:
-      packet["Latitude"] = element.LatitudeElement.fromSRT(val1.strip(" ,()"))
-      packet["Longitude"] = element.LongitudeElement.fromSRT(val2.strip(" ,()"))
+    if 'M' == block[gps_end - 1]:
+      packet["latitude"] = element.LatitudeElement.fromSRT(val1.strip(" ,()"))
+      packet["longitude"] = element.LongitudeElement.fromSRT(val2.strip(" ,()"))
     #long, lat
     else:
-      packet["Longitude"] = element.LatitudeElement.fromSRT(val1.strip(" ,()"))
-      packet["Latitude"] = element.LongitudeElement.fromSRT(val2.strip(" ,()"))
+      packet["longitude"] = element.LatitudeElement.fromSRT(val1.strip(" ,()"))
+      packet["latitude"] = element.LongitudeElement.fromSRT(val2.strip(" ,()"))
 
-    alt_end = block.find(')', val2_end)
-    alt = block[val2_end : alt_end]
-    bar_pos = block.index("BAROMETER", gps_pos, end_line)
-    if bar_pos:
+    alt = block[val2_end : gps_end]
+
+    # Favor BAROMETER measurement over altitude measurement
+    bar_pos = block.find("BAROMETER", gps_pos, end_line)
+    if bar_pos > 0:
       bar_end = bar_pos + 9 #len("BAROMETER")
-      alt = block[bar_end : ].strip(' M:,\n')
+      alt = block[bar_end : ]
     
-    packet["Altitude"] = element.AltitudeElement.fromSRT(alt)
+    packet["altitude"] = element.AltitudeElement.fromSRT(alt.strip(' ,():M\n'))
 
+  # Looks for telemetry of the form:
+  # [iso : 110] [shutter : 1/200.0] [fnum : 280] [ev : 0.7] [ct : 5064] [color_md : default] [focal_len : 240] [latitude: 0.608553] [longtitude: -1.963763] [altitude: 1429.697998] 
   def _extractData(self, block: str, packet: Dict[str, Element]):
     if "GPS" in block:
       self._extractGPS(block, packet)
     else:
-      # DJI wraps their telemetry in '[]' 
       # find the first '[' and last ']'
       data_start = block.find('[')
       data_end = block.rfind(']')

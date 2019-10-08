@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 import json
-from telemetry import Telemetry
-from packet import Packet
-from element import Element
+from .telemetry import Telemetry
+from .packet import Packet
+from .element import Element
 
 def telemetryToJson(tel: Telemetry, file: str, ind: int = 3):
   with open(file, 'w') as f:

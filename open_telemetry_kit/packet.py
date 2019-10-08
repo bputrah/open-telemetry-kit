@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 from collections import UserDict
-from element import Element
 from typing import Dict
+
+from .element import Element
 
 class Packet(UserDict):
   def __init__(self, elements: Dict[str, Element] = {}):

@@ -3,10 +3,10 @@
 import csv
 import logging
 
-from parser import Parser
-from telemetry import Telemetry
-from packet import Packet
-import element
+from .parser import Parser
+from .telemetry import Telemetry
+from .packet import Packet
+import open_telemetry_kit.element as element
 
 class CSVParser(Parser):
   ext = "csv"
@@ -18,8 +18,12 @@ class CSVParser(Parser):
       for name in cls.names:
         self.element_dict[name] = cls
 
+  def __str__(self):
+    #TODO: Implement me
+    pass
+
   def __repr__(self):
-    #TODO: figure out what the fuck I'm supposed to do here...
+    #TODO: Implement me
     pass
 
   def read(self) -> Telemetry:

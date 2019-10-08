@@ -15,7 +15,7 @@ ffmpeg and ffprobe
 >$ pip install open-telemetry-kit
 
 ### Quick Start
-Download `quickstart.py` from the Open Telemetry Kit git page.
+Download `quickstart.py` from the [Open Telemetry Kit](https://github.com/Hivemapper/open-telemetry-kit/) git page.
 
 Execute the script via:
 >$ python3 quickstart.py [/path/to/source/file.ext] [/path/to/save/dest.json]

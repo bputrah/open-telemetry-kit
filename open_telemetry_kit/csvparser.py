@@ -11,20 +11,8 @@ import open_telemetry_kit.element as element
 class CSVParser(Parser):
   ext = "csv"
 
-  def __init__(self, src: str):
-    self.source = src
-    self.element_dict = {}
-    for cls in element.Element.__subclasses__():
-      for name in cls.names:
-        self.element_dict[name] = cls
-
-  def __str__(self):
-    #TODO: Implement me
-    pass
-
-  def __repr__(self):
-    #TODO: Implement me
-    pass
+  def __init__(self, source: str):
+    super().__init__(source)
 
   def read(self) -> Telemetry:
     tel = Telemetry()

@@ -28,22 +28,9 @@ class SRTParser(Parser):
   ext = "srt"
 
   def __init__(self, source: str, is_embedded: bool = False):
-    self.source = source
-    self.element_dict = {}
-    for cls in element.Element.__subclasses__():
-      for name in cls.names:
-        self.element_dict[name] = cls
+    super().__init__(source)
     self.is_embedded = is_embedded
     self.beg_timestamp = 0
-
-
-  def __str__(self):
-    #TODO: Implement me
-    pass
-
-  def __repr__(self):
-    #TODO: Implement me
-    pass
 
   def read(self) -> Telemetry:
     if self.is_embedded:
@@ -54,18 +41,14 @@ class SRTParser(Parser):
 
     tel = Telemetry()
     with open(self.source, 'r') as src:
-      # read block
       block = ""
       for line in src:
         if line == '\n' and len(block) > 0:
           packet = Packet()
           sec_line_beg = block.find('\n') + 1
           sec_line_end = block.find('\n', sec_line_beg)
-          # get block times
           self._extractTimeframe(block[sec_line_beg: sec_line_end], packet)
-          # get datetime
           self._extractTimestamp(block[sec_line_end + 1 :], packet)
-          # search GPS
           self._extractData(block[sec_line_end + 1:], packet)
           tel.append(packet)
           block = ""
@@ -154,6 +137,7 @@ class SRTParser(Parser):
       data_start = block.find('[')
       data_end = block.rfind(']')
       data = block[data_start : data_end]
+
       # This will split on the common delimters found in DJIs srts and return a list
       # List _should_ be alternating keyword, value barring nothing weird from DJI
       # which they have proven is not a safe assumption

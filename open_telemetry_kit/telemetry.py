@@ -10,15 +10,5 @@ class Telemetry(UserList):
   def __init__(self, packets: List[Packet] = []):
     UserList.__init__(self, packets)
 
-  def __str__(self):
-    #TODO: Implement me
-    # return str(self.data) 
-    pass
-
-  def __repr__(self):
-    #TODO: Implement me
-    # return UserList.__repr__(self.data)
-    pass
-
   def toJson(self) -> List[Packet]:
     return self.data

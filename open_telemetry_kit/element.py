@@ -8,8 +8,11 @@ class Element():
   def __init__(self, value: Any):
     self.value = value
 
+  def __str__(self):
+    return '{}'.format(self.value)
+
   def __repr__(self) -> str:
-    return '{}({})'.format(self.__class__.__name__, self.value)
+    return "{}('{}')".format(self.__class__.__name__, self.value)
 
   @property
   @classmethod

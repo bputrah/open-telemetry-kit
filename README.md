@@ -5,14 +5,25 @@
 The Open Telemetry Kit (OTK) is an open source package for extracting and parsing telemetry associated with video streams and converting to common formats.
 It comes out of a need for a singular API that can be used for multiple different video telemetry formats.
 
+Features:
 - Automatically detect telemetry format
 - Manipulate telemetry with ease
 - Write telemetry to a new format
 
 ## Getting Started
 ### Prerequisites
-ffmpeg and ffprobe
+Python version: `>=3.6`
+
+
+`ffmpeg` and `ffprobe`.
+
+On Debian systems these can be installed with:
 >$ sudo apt install ffmpeg
+
+`dateutil`
+
+On Debian systems this can be installed with:
+>$ pip install python-dateutil
 
 ### Installation
 >$ pip install open-telemetry-kit
@@ -27,27 +38,26 @@ The script accepts a `.csv`, `.srt` or a video file with embedded subtitles.
 It will read in the data, convert it to JSON, and write it to the provided destination.
 
 ### Current Functionality
-#### Reading
-The OTK currently works with the following forms of telemetry:
+#### Input Formats
+The OTK currently supports the following forms of telemetry:
 - `.csv` files
 - `.srt` files
 - Any video file with embedded subtitles (e.g. video taken with some DJI drone models)
 
-#### Writing
+#### Output Formats
 - JSON
 
 ### Future Releases
-Expansions and updates for the OTK include but are not limited to:
-#### Reading
-- kml
-- gpx
-- klv
+Planned expansions and updates for the OTK include:
+#### Input Formats
+- `.kml`
+- `.gpx`
+- KLV/MISB embedded data
 
-#### Writing
+#### Output Formats
 - geoJSON
-- Binary formats?
 
 #### Other
 - Logging
 - Error checking
-- Unit Testing
+- Unit Tests

@@ -22,4 +22,7 @@ for packet in telemetry:
   gps.append({ k:v for k, v in packet.items() if k in ['latitude', 'longitude', 'altitude']})
 
 # Write Telemetry object to JSON
-write.telemetryToJson(gps, dest)
+write.telemetryToJson(telemetry, dest)
+
+# Write gps only Telemetry object to JSON
+# write.telemetryToJson(gps, dest)

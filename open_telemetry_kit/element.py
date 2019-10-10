@@ -2,6 +2,7 @@
 
 import logging
 from abc import abstractmethod
+from datetime import datetime
 from typing import Any, Set
 
 class Element():
@@ -54,6 +55,16 @@ class TimestampElement(Element):
   @classmethod
   def fromSRT(cls, value: str) -> Element:
     return cls(int(value))
+
+class DatetimeElement(Element):
+  name = "datetime"
+  names = {"datetime", "Datetime", "DateTime", "time"}
+
+  def __init__(self, value: datetime):
+    self.value = value
+
+  def fromstr(self, value: str) -> Element:
+    pass
   
 class MissionIDElement(Element):
   name = "missionID" 
@@ -194,7 +205,7 @@ class AltitudeElement(Element):
   name = "altitude"
   names = {"Altitude", "altitude", "sensorTrueAltitude", "SensorTrueAltitude",
            "sensortruealtitude", "Sensor True Altitude", "sensor true altitude",
-           "ALT", "Alt", "alt", "Altitude (m)"}
+           "ALT", "Alt", "alt", "Altitude (m)", "ele"}
 
   def __init__(self, value: float):
     self.value = value

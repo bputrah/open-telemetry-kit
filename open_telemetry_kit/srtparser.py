@@ -6,13 +6,11 @@
 # [iso : 110] [shutter : 1/200.0] [fnum : 280] [ev : 0.7] [ct : 5064] [color_md : default] [focal_len : 240] [latitude: 0.608553] [longtitude: -1.963763] [altitude: 1429.697998] </font>
 
 # 2
-# 00:00:00,033 --> 00:00:00,066
 # <font size="36">FrameCnt : 2, DiffTime : 33ms
-# 2019-09-25 01:22:35,118,697
 # [iso : 110] [shutter : 1/200.0] [fnum : 280] [ev : 0.7] [ct : 5064] [color_md : default] [focal_len : 240] [latitude: 0.608553] [longtitude: -1.963763] [altitude: 1429.697998] </font>
 
 from datetime import timedelta
-import pandas as pd
+from dateutil import parser as dup
 import re
 from typing import Dict
 import os
@@ -37,7 +35,7 @@ class SRTParser(Parser):
       path, _, _ = detector.split_path(self.source)
       metadata = detector.read_video_metadata(os.path.join(path, "metadata.json"))
       datetime = metadata["streams"][0]["tags"]["creation_time"]
-      self.beg_timestamp = int(pd.Timestamp(datetime).to_pydatetime().timestamp() * 1000)
+      self.beg_timestamp = int(dup.parse(datetime).timestamp() * 1000)
 
     tel = Telemetry()
     with open(self.source, 'r') as src:
@@ -59,15 +57,17 @@ class SRTParser(Parser):
 
       return tel
 
+  # Example timeframe:
+  # 00:00:00,033 --> 00:00:00,066
   def _extractTimeframe(self, line: str, packet: Dict[str, Element]):
     sep_pos = line.find("-->")
-    tfb = pd.Timestamp(line[:sep_pos].strip())
-    tfb = timedelta(hours=tfb.hour, minutes=tfb.minute, seconds=tfb.second, microseconds=tfb.microsecond).total_seconds()
+    tfb = (dup.parse(line[:sep_pos].strip()) - dup.parse("00:00:00")).total_seconds()
     packet["timeframeBegin"] = element.TimeframeBeginElement.fromSRT(tfb)
-    tfe = pd.Timestamp(line[sep_pos+3:].strip())
-    tfe = timedelta(hours=tfe.hour, minutes=tfe.minute, seconds=tfe.second, microseconds=tfe.microsecond).total_seconds()
+    tfe = (dup.parse(line[sep_pos+3:].strip()) - dup.parse("00:00:00")).total_seconds()
     packet["timeframeEnd"] = element.TimeframeBeginElement.fromSRT(tfe)
 
+  # Example timestamp
+  # 2019-09-25 01:22:35,118,697
   def _extractTimestamp(self, block: str, packet: Dict[str, Element]):
     # This should find any reasonably formatted (and some not so reasonably formatted) datetimes
     # Looks for:
@@ -77,9 +77,11 @@ class SRTParser(Parser):
     #   the same separator previously found, any amount of whitespace, any number of digits 
     ts = re.search(r"\d+([\/\-\.])\d+\1\d+\s+\d+:\d+:\d+([.,])?\s*\d*\2?\s*\d*", block)
 
-    # pandas timestamp is pretty good, but can't handle the double microsecond separator 
+    # dateutil is pretty good, but can't handle the double microsecond separator 
     # that sometimes shows up in DJIs telemetry so check to see if it exists and get rid of it
     # Also, convert to epoch microseconds while we're at it
+    # TODO: conversion to epoch shouldn't be forced. Save as it's read in and add a funtion
+    #       to convert if the user desires
     if ts:
       micro_syn = ts[2]
       ts = ts[0]
@@ -87,7 +89,7 @@ class SRTParser(Parser):
         #concatentate timestamp pre-2nd separator with post-2nd separator
         ts = ts[:ts.rfind(micro_syn)] + ts[ts.rfind(micro_syn)+1:]
       
-      ts = int(pd.Timestamp(ts).to_pydatetime().timestamp() * 1000)
+      ts = int(dup.parse(ts).timestamp() * 1000)
       packet["timestamp"] = element.TimestampElement.fromSRT(ts)
     
     elif self.is_embedded and self.beg_timestamp != 0:

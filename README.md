@@ -12,10 +12,18 @@ Features:
 
 ## Getting Started
 ### Prerequisites
+Python version: `>=3.6`
+
+
 `ffmpeg` and `ffprobe`.
 
 On Debian systems these can be installed with:
 >$ sudo apt install ffmpeg
+
+`dateutil`
+
+On Debian systems this can be installed with:
+>$ pip install python-dateutil
 
 ### Installation
 >$ pip install open-telemetry-kit

@@ -14,7 +14,7 @@ class GPXParser(Parser):
   def read(self):
     tree = ET.parse(self.source)
     tel = Telemetry()
-    self._traverse_tree(tree.getroot, tel)
+    self._traverse_tree(tree.getroot(), tel)
     return tel
 
   def _traverse_tree(self, node, tel):
@@ -36,7 +36,7 @@ class GPXParser(Parser):
     pass
 
   def _extract_trkpt(self, node, packet):
-    for key, val in node.items:
+    for key, val in node.items():
       self._add_element(packet, key, val)
 
     if not node.text.isspace():
@@ -44,7 +44,7 @@ class GPXParser(Parser):
       self._add_element(packet, tag, node.text.strip())
 
     for child in node:
-      self._extract_metadata(child, packet)
+      self._extract_trkpt(child, packet)
 
 
   def _add_element(self, packet, key, val):

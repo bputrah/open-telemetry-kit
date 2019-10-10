@@ -3,6 +3,7 @@
 import logging
 from abc import abstractmethod
 from datetime import datetime
+from dateutil import parser as dup
 from typing import Any, Set
 
 class Element():
@@ -10,7 +11,8 @@ class Element():
     self.value = value
 
   def __str__(self):
-    return '{}'.format(self.value)
+    # return '{}'.format(self.value)
+    return self.value
 
   def __repr__(self) -> str:
     return "{}('{}')".format(self.__class__.__name__, self.value)
@@ -63,9 +65,10 @@ class DatetimeElement(Element):
   def __init__(self, value: datetime):
     self.value = value
 
-  def fromstr(self, value: str) -> Element:
-    pass
-  
+  @classmethod
+  def fromGPX(cls, value: str) -> Element:
+    return cls(dup.parse(value))
+
 class MissionIDElement(Element):
   name = "missionID" 
   names = {"missionID", "MissionId", "Missionid", "missionID",
@@ -184,6 +187,10 @@ class LatitudeElement(Element):
   def fromSRT(cls, value: str) -> Element:
     return cls(float(value))
 
+  @classmethod
+  def fromGPX(cls, value: str) -> Element:
+    return cls(float(value))
+
 class LongitudeElement(Element):
   name = "longitude"
   names = {"Longitude", "longitude", "sensorLongitude", "SensorLongitude",
@@ -199,6 +206,10 @@ class LongitudeElement(Element):
 
   @classmethod
   def fromSRT(cls, value: str) -> Element:
+    return cls(float(value))
+
+  @classmethod
+  def fromGPX(cls, value: str) -> Element:
     return cls(float(value))
   
 class AltitudeElement(Element):
@@ -218,6 +229,9 @@ class AltitudeElement(Element):
   def fromSRT(cls, value: str) -> Element:
     return cls(float(value))
 
+  @classmethod
+  def fromGPX(cls, value: str) -> Element:
+    return cls(float(value))
 class SensorEllipsoidHeightElement(Element):
   name = "sensorEllipsoidHeight"
   names = {"sensorEllipsoidHeight", "SensorEllipsoidHeight", "sensorellipsoidheight",
@@ -488,6 +502,17 @@ class TimeframeEndElement(Element):
 
   @classmethod
   def fromSRT(cls, value: str) -> Element:
+    return cls(float(value))
+
+class SpeedElement(Element):
+  name = "speed"
+  names = {"speed", "Speed", "velocity", "Velocity", "badelf:speed"}
+
+  def __init__(self, value):
+    self.value = value
+
+  @classmethod
+  def fromGPX(cls, value: str) -> Element:
     return cls(float(value))
   
 class UnknownElement(Element):

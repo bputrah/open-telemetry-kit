@@ -85,7 +85,7 @@ class SRTParser(Parser):
     if ts:
       micro_syn = ts[2]
       ts = ts[0]
-      if ts.count(micro_syn) > 1:
+      if micro_syn and ts.count(micro_syn) > 1:
         #concatentate timestamp pre-2nd separator with post-2nd separator
         ts = ts[:ts.rfind(micro_syn)] + ts[ts.rfind(micro_syn)+1:]
       
@@ -99,8 +99,8 @@ class SRTParser(Parser):
       packet["timestamp"] = element.TimestampElement.fromSRT(self.beg_timestamp + ts)
 
   # Looks for GPS telemetry of the form:
-  # GPS(-122.3699,37.5929,19) BAROMETER:64.3 (long, lat) OR
-  # GPS(37.8757,-122.3061,0.0M) BAROMETER:36.9M (lat, long)
+  # GPS(-122.3699,37.5929,19) BAROMETER:64.3 //(long, lat) OR
+  # GPS(37.8757,-122.3061,0.0M) BAROMETER:36.9M //(lat, long)
   def _extractGPS(self, block: str, packet: Dict[str, Element]):
     gps_pos = block.find("GPS")
     gps_end = block.find(')', gps_pos)
@@ -125,7 +125,7 @@ class SRTParser(Parser):
     bar_pos = block.find("BAROMETER", gps_pos, end_line)
     if bar_pos > 0:
       bar_end = bar_pos + 9 #len("BAROMETER")
-      alt = block[bar_end : ]
+      alt = block[bar_end : end_line]
     
     packet["altitude"] = element.AltitudeElement.fromSRT(alt.strip(' ,():M\n'))
 

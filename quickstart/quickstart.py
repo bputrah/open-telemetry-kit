@@ -3,10 +3,11 @@ import open_telemetry_kit.detector as detector
 from open_telemetry_kit.telemetry import Telemetry
 
 import sys
-
+source = "/home/adam/Documents/telemetry_extraction/OTK_samples/DJI_0001.srt"
+dest = "/home/adam/hivemapper/open-telemetry-kit/test.json"
 # Read in source file and output file
-source = sys.argv[1]
-dest = sys.argv[2]
+# source = sys.argv[1]
+# dest = sys.argv[2]
 
 # Create Parser object used to parse source file
 parser = detector.create_telemetry_parser(source)

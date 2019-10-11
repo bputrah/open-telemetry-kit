@@ -58,7 +58,10 @@ def create_telemetry_parser(src: str) -> Parser:
 
   for cls in Parser.__subclasses__():
     if tel_type == cls.ext:
-      return cls(tel_src, embedded)
+      if not embedded:
+        return cls(tel_src)
+      else:
+        return cls(tel_src, embedded)
 
 def extract_embedded_subtitles(src: str) -> str:
   path, src_file, _ = split_path(src)

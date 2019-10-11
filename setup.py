@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="open_telemetry_kit",
-    version="0.1.0",
+    version="0.1.1",
     author="Adam Driscoll",
     author_email="adam@hivemapper.com",
     description="Open source package for extracting and parsing telemetry associated with video streams and converting to common formats.",

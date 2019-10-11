@@ -21,21 +21,14 @@ class GPXParser(Parser):
     for child in node:
       # Ignore namespace if it exists
       tag = child.tag[child.tag.find('}')+1:]
-      if tag == "metadata":
+      if tag in {"trkpt", "metadata"}:
         packet = Packet()
-        self._extract_metadata(child, packet)
-        tel.append(packet)
-      if tag == "trkpt":
-        packet = Packet()
-        self._extract_trkpt(child, packet)
+        self._extract_node(child, packet)
         tel.append(packet)
 
       self._traverse_tree(child, tel)
   
-  def _extract_metadata(self, node, packet):
-    pass
-
-  def _extract_trkpt(self, node, packet):
+  def _extract_node(self, node, packet):
     for key, val in node.items():
       self._add_element(packet, key, val)
 
@@ -44,8 +37,7 @@ class GPXParser(Parser):
       self._add_element(packet, tag, node.text.strip())
 
     for child in node:
-      self._extract_trkpt(child, packet)
-
+      self._extract_node(child, packet)
 
   def _add_element(self, packet, key, val):
       if key in self.element_dict:

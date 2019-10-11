@@ -31,10 +31,10 @@ On Debian systems this can be installed with:
 >$ pip install open-telemetry-kit
 
 ### Quick Start
-Download `quickstart.py` from the [Open Telemetry Kit](https://github.com/Hivemapper/open-telemetry-kit/) git page.
+Download `quickstart.py` and `DJI_telemetry.srt` from the [Open Telemetry Kit](https://github.com/Hivemapper/open-telemetry-kit/quickstart) git page.
 
 Execute the script via:
->$ python3 quickstart.py [/path/to/source/file.ext] [/path/to/save/dest.json]
+>$ python3 quickstart.py [/path/to/source/DJI_telemetry.json] [/path/to/save/destination.json]
 
 The script accepts a `.csv`, `.srt` or a video file with embedded subtitles. 
 It will read in the data, convert it to JSON, and write it to the provided destination.

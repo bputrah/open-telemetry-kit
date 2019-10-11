@@ -5,6 +5,8 @@
 The Open Telemetry Kit (OTK) is an open source package for extracting and parsing telemetry associated with video streams and converting to common formats.
 It comes out of a need for a singular API that can be used for multiple different video telemetry formats.
 
+Telemetry that can be parsed includes: GPS, time, camera information, speed
+
 Features:
 - Automatically detect telemetry format
 - Manipulate telemetry with ease

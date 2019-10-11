@@ -173,6 +173,10 @@ class LatitudeElement(Element):
   def fromSRT(cls, value: str) -> Element:
     return cls(float(value))
 
+  @classmethod
+  def fromKML(cls, value: str) -> Element:
+    return cls(float(value))
+
 class LongitudeElement(Element):
   name = "longitude"
   names = {"Longitude", "longitude", "sensorLongitude", "SensorLongitude",
@@ -190,6 +194,10 @@ class LongitudeElement(Element):
   def fromSRT(cls, value: str) -> Element:
     return cls(float(value))
   
+  @classmethod
+  def fromKML(cls, value: str) -> Element:
+    return cls(float(value))
+
 class AltitudeElement(Element):
   name = "altitude"
   names = {"Altitude", "altitude", "sensorTrueAltitude", "SensorTrueAltitude",
@@ -205,6 +213,10 @@ class AltitudeElement(Element):
   
   @classmethod
   def fromSRT(cls, value: str) -> Element:
+    return cls(float(value))
+
+  @classmethod
+  def fromKML(cls, value: str) -> Element:
     return cls(float(value))
 
 class SensorEllipsoidHeightElement(Element):

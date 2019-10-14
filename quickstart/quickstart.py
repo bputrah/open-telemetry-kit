@@ -15,14 +15,14 @@ parser = detector.create_telemetry_parser(source)
 # Returns a Telemetry object
 telemetry = parser.read()
 
-# Example telemetry manipulation
-# Filters out anything thats not a GPS element
-gps = Telemetry()
-for packet in telemetry:
-  gps.append({ k:v for k, v in packet.items() if k in ['latitude', 'longitude', 'altitude']})
-
 # Write Telemetry object to JSON
 write.telemetryToJson(telemetry, dest)
+
+# Example telemetry manipulation
+# Filters out anything thats not a GPS element
+# gps = Telemetry()
+# for packet in telemetry:
+#   gps.append({ k:v for k, v in packet.items() if k in ['latitude', 'longitude', 'altitude']})
 
 # Write gps only Telemetry object to JSON
 # write.telemetryToJson(gps, dest)

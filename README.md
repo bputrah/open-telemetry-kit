@@ -51,7 +51,9 @@ It will read in the data, convert it to JSON, and write it to the provided desti
 
 From the new OTK_quickstart directory, you can execute the script via one of the following:
 >$ python3 quickstart.py srt_example.srt srt_example.json
+
 >$ python3 quickstart.py csv_example.csv csv_example.json
+
 >$ python3 quickstart.py embedded_srt_example.mov embedded_srt_example.json
 
 This process will create a new JSON file containing the telemetry extracted from the sample file.

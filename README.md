@@ -52,13 +52,13 @@ It will read in the data, convert it to JSON, and write it to the provided desti
 
 From the new OTK_quickstart directory, you can execute the script via one of the following commands.
 
-**Extract telemetry from the sample video:**
+Extract telemetry from the sample video:
 
 >$ python3 quickstart.py embedded_srt_example.mov embedded_srt_example.json
 
 _Note: Because the telemetry is embedded, this script will create a `metadata.json` file and extract the data into `[video_name].srt`. This will not happen with standalone telemetry files like in the examples below._
 
-**Extract telemetry from the sample `srt` or `csv` files respectively:**
+Extract telemetry from the sample `srt` or `csv` files respectively:
 
 >$ python3 quickstart.py srt_example.srt srt_example.json
 

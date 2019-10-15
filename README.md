@@ -37,7 +37,7 @@ The OTK package can be imported into your python3 project with:
 For an example of OTK usage you can download the OTK quickstart package (~90 MB).
 This includes a sample `.csv`, `.srt`, and `.mov` with embedded telemetry.
 It also contains `quickstart.py` which you can use to extract the telemetry from the sample files.
-(Mac users can install wget using [these instructions](https://www.maketecheasier.com/install-wget-mac/))
+(Mac users can install `wget` using [these instructions](https://www.maketecheasier.com/install-wget-mac/))
 
 >$ wget https://hivemapper-sample-videos.s3-us-west-2.amazonaws.com/OTK/OTK_quickstart.tgz
 

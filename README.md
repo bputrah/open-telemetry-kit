@@ -50,16 +50,22 @@ This will extract everythin into a new directory called `OTK_quickstart/`
 The `quickstart.py` script accepts a standalone `.csv` or `.srt` or a video file with an embedded `.srt`. 
 It will read in the data, convert it to JSON, and write it to the provided destination. 
 
-From the new OTK_quickstart directory, you can execute the script via one of the following:
+From the new OTK_quickstart directory, you can execute the script via one of the following commands.
+
+To extract telemetry from the sample video:
+
+>$ python3 quickstart.py embedded_srt_example.mov embedded_srt_example.json
+
+Note: Because the telemetry is embedded, this script will create a `metadata.json` file and extract the data into `[video_name].srt`.
+This will not happen with standalone telemetry files like in the examples below.
+
+To extract telemetry from the sample `srt` or `csv` files respectively:
 >$ python3 quickstart.py srt_example.srt srt_example.json
 
 >$ python3 quickstart.py csv_example.csv csv_example.json
 
->$ python3 quickstart.py embedded_srt_example.mov embedded_srt_example.json
-
 This process will create a new JSON file containing the telemetry extracted from the sample file.
-
-Note: If the telemetry is embedded (e.g. the third example) this script will also create a `metadata.json` file and extract the data into `[video_name].srt`
+The data is organized into an array of objects (or, in python terminology, a list of dictionaries)
 
 For an example of simple data manipulation, open `quickstart.py` and uncomment the lines:
 

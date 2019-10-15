@@ -45,7 +45,7 @@ Extract the package:
 
 >$ tar xvf OTK_quickstart.tgz
 
-This will extract everythin into a new directory called `OTK_quickstart/`
+This will extract everything into a new directory called `OTK_quickstart/`
 
 The `quickstart.py` script accepts a standalone `.csv` or `.srt` or a video file with an embedded `.srt`. 
 It will read in the data, convert it to JSON, and write it to the provided destination. 

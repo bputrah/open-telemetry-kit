@@ -42,6 +42,6 @@ class GPXParser(Parser):
   def _add_element(self, packet, key, val):
       if key in self.element_dict:
         element_cls = self.element_dict[key]
-        packet[element_cls.name] = element_cls.fromGPX(val)
+        packet[element_cls.name] = element_cls(val)
       else: 
         packet[key] = UnknownElement(val)

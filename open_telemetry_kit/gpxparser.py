@@ -5,6 +5,7 @@ from .element import Element, UnknownElement
 
 import xml.etree.ElementTree as ET
 
+# Reference: http://www.topografix.com/GPX/1/1/
 class GPXParser(Parser):
   ext = 'gpx'
 
@@ -21,7 +22,8 @@ class GPXParser(Parser):
     for child in node:
       # Ignore namespace if it exists
       tag = child.tag[child.tag.find('}')+1:]
-      if tag in {"trkpt", "metadata"}:
+      # These are all of the tags that contain the data we care about
+      if tag in {"trkpt", "metadata", "rtept", "wpt"}:
         packet = Packet()
         self._extract_node(child, packet)
         tel.append(packet)

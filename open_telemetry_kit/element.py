@@ -51,7 +51,10 @@ class DatetimeElement(Element):
   names = {"datetime", "Datetime", "DateTime", "time"}
 
   def __init__(self, value: datetime):
-    self.value = value
+    self.value = dup.parse(value)
+
+  def toJson(self) -> str:
+    return str(self.value)
 
 class MissionIDElement(Element):
   name = "missionID" 

@@ -2,6 +2,8 @@
 
 import logging
 from abc import abstractmethod
+from datetime import datetime
+from dateutil import parser as dup
 from typing import Any, Set
 
 class Element():
@@ -9,7 +11,8 @@ class Element():
     self.value = value
 
   def __str__(self):
-    return '{}'.format(self.value)
+    # return '{}'.format(self.value)
+    return self.value
 
   def __repr__(self) -> str:
     return "{}('{}')".format(self.__class__.__name__, self.value)
@@ -42,6 +45,16 @@ class TimestampElement(Element):
 
   def __init__(self, value: int):
     self.value = int(value)
+
+class DatetimeElement(Element):
+  name = "datetime"
+  names = {"datetime", "Datetime", "DateTime", "time"}
+
+  def __init__(self, value: datetime):
+    self.value = dup.parse(value)
+
+  def toJson(self) -> str:
+    return str(self.value)
 
 class MissionIDElement(Element):
   name = "missionID" 
@@ -134,7 +147,7 @@ class AltitudeElement(Element):
   name = "altitude"
   names = {"Altitude", "altitude", "sensorTrueAltitude", "SensorTrueAltitude",
            "sensortruealtitude", "Sensor True Altitude", "sensor true altitude",
-           "ALT", "Alt", "alt", "Altitude (m)"}
+           "ALT", "Alt", "alt", "Altitude (m)", "ele"}
 
   def __init__(self, value: float):
     self.value = float(value)
@@ -279,10 +292,6 @@ class UASLocalSetVersionElement(Element):
 
 #   def __init__(self, value: float):
 #     self.value = value
-
-#   @classmethod
-#   def fromCSV(cls, value: str) -> Element:
-#     return cls(float(value))
   
 class SensorWGS84AltitudeElement(Element):
   name = "sensorWGS84Altitude"
@@ -320,6 +329,13 @@ class TimeframeEndElement(Element):
   name = "timeframeEnd"
   names = {"timeframeEnd", "TimeframeEnd", "timeframeend", "Timeframe End",
            "timeframe end"}
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class SpeedElement(Element):
+  name = "speed"
+  names = {"speed", "Speed", "velocity", "Velocity", "badelf:speed"}
 
   def __init__(self, value: float):
     self.value = float(value)

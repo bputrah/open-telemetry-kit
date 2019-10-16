@@ -43,7 +43,7 @@ It also contains `quickstart.py` which you can use to extract the telemetry from
 
 Extract the package:
 
->$ tar xvf OTK_quickstart.tgz
+>$ tar xzvf OTK_quickstart.tgz
 
 This will extract everything into a new directory called `OTK_quickstart/`
 

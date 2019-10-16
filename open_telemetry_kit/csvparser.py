@@ -6,7 +6,7 @@ import logging
 from .parser import Parser
 from .telemetry import Telemetry
 from .packet import Packet
-import open_telemetry_kit.element as element
+from .element import UnknownElement
 
 class CSVParser(Parser):
   ext = "csv"
@@ -24,9 +24,9 @@ class CSVParser(Parser):
           if key in self.element_dict:
             #element_dict[key] returns a class
             element_cls = self.element_dict[key]
-            packet[element_cls.name] = element_cls.fromCSV(val)
+            packet[element_cls.name] = element_cls(val)
           else:
-            packet[key] = element.UnknownElement(val)
+            packet[key] = UnknownElement(val)
         
         tel.append(packet)
 

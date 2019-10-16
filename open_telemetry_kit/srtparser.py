@@ -18,8 +18,10 @@ import os
 from .parser import Parser
 from .telemetry import Telemetry
 from .packet import Packet
-import open_telemetry_kit.element as element
-from .element import Element
+# import open_telemetry_kit.element as element
+from .element import Element, UnknownElement
+from .element import TimestampElement, TimeframeBeginElement, TimeframeEndElement
+from .element import LatitudeElement, LongitudeElement, AltitudeElement
 import open_telemetry_kit.detector as detector
 
 class SRTParser(Parser):
@@ -62,9 +64,9 @@ class SRTParser(Parser):
   def _extractTimeframe(self, line: str, packet: Dict[str, Element]):
     sep_pos = line.find("-->")
     tfb = (dup.parse(line[:sep_pos].strip()) - dup.parse("00:00:00")).total_seconds()
-    packet["timeframeBegin"] = element.TimeframeBeginElement.fromSRT(tfb)
+    packet["timeframeBegin"] = TimeframeBeginElement(tfb)
     tfe = (dup.parse(line[sep_pos+3:].strip()) - dup.parse("00:00:00")).total_seconds()
-    packet["timeframeEnd"] = element.TimeframeBeginElement.fromSRT(tfe)
+    packet["timeframeEnd"] = TimeframeEndElement(tfe)
 
   # Example timestamp
   # 2019-09-25 01:22:35,118,697
@@ -90,13 +92,13 @@ class SRTParser(Parser):
         ts = ts[:ts.rfind(micro_syn)] + ts[ts.rfind(micro_syn)+1:]
       
       ts = int(dup.parse(ts).timestamp() * 1000)
-      packet["timestamp"] = element.TimestampElement.fromSRT(ts)
+      packet["timestamp"] = TimestampElement(ts)
     
     elif self.is_embedded and self.beg_timestamp != 0:
       tfb = packet["timeframeBegin"].value
       tfe = packet["timeframeEnd"].value
       ts = 500 * (tfb+tfe) #average and convert to microseconds (sum * 1000/2)
-      packet["timestamp"] = element.TimestampElement.fromSRT(self.beg_timestamp + ts)
+      packet["timestamp"] = TimestampElement(self.beg_timestamp + ts)
 
   # Looks for GPS telemetry of the form:
   # GPS(-122.3699,37.5929,19) BAROMETER:64.3 //(long, lat) OR
@@ -112,12 +114,12 @@ class SRTParser(Parser):
     val2 = block[val1_end : val2_end]
     # lat, long
     if 'M' == block[gps_end - 1]:
-      packet["latitude"] = element.LatitudeElement.fromSRT(val1.strip(" ,()"))
-      packet["longitude"] = element.LongitudeElement.fromSRT(val2.strip(" ,()"))
+      packet["latitude"] = LatitudeElement(val1.strip(" ,()"))
+      packet["longitude"] = LongitudeElement(val2.strip(" ,()"))
     #long, lat
     else:
-      packet["longitude"] = element.LatitudeElement.fromSRT(val1.strip(" ,()"))
-      packet["latitude"] = element.LongitudeElement.fromSRT(val2.strip(" ,()"))
+      packet["longitude"] = LatitudeElement(val1.strip(" ,()"))
+      packet["latitude"] = LongitudeElement(val2.strip(" ,()"))
 
     alt = block[val2_end : gps_end]
 
@@ -127,7 +129,7 @@ class SRTParser(Parser):
       bar_end = bar_pos + 9 #len("BAROMETER")
       alt = block[bar_end : end_line]
     
-    packet["altitude"] = element.AltitudeElement.fromSRT(alt.strip(' ,():M\n'))
+    packet["altitude"] = AltitudeElement(alt.strip(' ,():M\n'))
 
   # Looks for telemetry of the form:
   # [iso : 110] [shutter : 1/200.0] [fnum : 280] [ev : 0.7] [ct : 5064] [color_md : default] [focal_len : 240] [latitude: 0.608553] [longtitude: -1.963763] [altitude: 1429.697998] 
@@ -151,6 +153,6 @@ class SRTParser(Parser):
         key = data[i]
         if key in self.element_dict:
           element_cls = self.element_dict[key]
-          packet[element_cls.name] = element_cls.fromSRT(data[i+1])
+          packet[element_cls.name] = element_cls(data[i+1])
         else:
-          packet[key] = element.UnknownElement(data[i+1])
+          packet[key] = UnknownElement(data[i+1])

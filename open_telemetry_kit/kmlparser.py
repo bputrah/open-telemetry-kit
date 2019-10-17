@@ -1,7 +1,8 @@
 from .parser import Parser
 from .telemetry import Telemetry
 from .packet import Packet
-from .element import LatitudeElement, LongitudeElement, AltitudeElement
+from .element import LatitudeElement, LongitudeElement, AltitudeElement, DatetimeElement
+from typing import List
 
 import io
 import xml.etree.ElementTree as ET
@@ -11,6 +12,7 @@ class KMLParser(Parser):
 
   def __init__(self, source: str):
     super().__init__(source)
+    self.ns = dict()
 
   def read(self):
     tel = Telemetry()
@@ -23,6 +25,8 @@ class KMLParser(Parser):
       tag = child.tag[child.tag.find('}')+1:]
       if tag == "coordinates" and child.text:
         self._read_coords(io.StringIO(child.text.strip()), tel)
+      elif tag == "Track":
+        self._read_track(child, tel)
       
       self._traverse_tree(child, tel)
 
@@ -30,8 +34,25 @@ class KMLParser(Parser):
     for line in sstream:
       packet = Packet()
       coords = line.strip().split(',')
-      packet[LatitudeElement.name] = LatitudeElement.fromKML(coords[0]) 
-      packet[LongitudeElement.name] = LongitudeElement.fromKML(coords[1])
-      if len(coords) == 3:
-        packet[AltitudeElement.name] = AltitudeElement.fromKML(coords[2])
+      self._process_coords(coords, packet)
       tel.append(packet)
+
+  def _read_track(self, node: ET.Element, tel: Telemetry):
+    packets = []
+    for child in node:
+      tag = child.tag[child.tag.find('}')+1:]
+      if tag == "when":
+        packet = Packet()
+        packet["datetime"] = DatetimeElement(child.text)
+        packets.append(packet)
+      elif tag == "coord":
+        packet = packets.pop(0)
+        coords = child.text.split()
+        self._process_coords(coords, packet)
+        tel.append(packet)
+
+  def _process_coords(self, coords: List[str], packet: Packet):
+      packet[LatitudeElement.name] = LatitudeElement(coords[0]) 
+      packet[LongitudeElement.name] = LongitudeElement(coords[1])
+      if len(coords) == 3:
+        packet[AltitudeElement.name] = AltitudeElement(coords[2])

@@ -134,6 +134,10 @@ class LatitudeElement(Element):
   def __init__(self, value: float):
     self.value = float(value)
 
+  @classmethod
+  def fromKML(cls, value: str) -> Element:
+    return cls(float(value))
+
 class LongitudeElement(Element):
   name = "longitude"
   names = {"Longitude", "longitude", "sensorLongitude", "SensorLongitude",
@@ -151,6 +155,10 @@ class AltitudeElement(Element):
 
   def __init__(self, value: float):
     self.value = float(value)
+
+  @classmethod
+  def fromKML(cls, value: str) -> Element:
+    return cls(float(value))
 
 class SensorEllipsoidHeightElement(Element):
   name = "sensorEllipsoidHeight"

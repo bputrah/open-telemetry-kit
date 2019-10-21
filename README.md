@@ -62,7 +62,8 @@ Extract telemetry from the sample video:
 
 >$ python3 quickstart.py embedded_srt_example.mov embedded_srt_example.json
 
-Note: Because the telemetry is embedded, this script will create a `metadata.json` file and extract the data into `[video_name].srt`. This will not happen with standalone telemetry files like in the examples below.
+
+_Note: Because the telemetry is embedded, this script will create a `metadata.json` file and extract the data into `[video_name].srt`. This will not happen with standalone telemetry files like in the examples below._
 
 Extract telemetry from the sample `srt` or `csv` files respectively:
 
@@ -70,8 +71,9 @@ Extract telemetry from the sample `srt` or `csv` files respectively:
 
 >$ python3 quickstart.py csv_example.csv csv_example.json
 
-Note: This process will create a new JSON file containing the telemetry extracted from the sample file.
-The data is organized into an array of objects (or, in python terminology, a list of dictionaries)
+
+_Note: This process will create a new JSON file containing the telemetry extracted from the sample file.
+The data is organized into an array of objects (or, in python terminology, a list of dictionaries)_
 
 
 #### Data manipulation example

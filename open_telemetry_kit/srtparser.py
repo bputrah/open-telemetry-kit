@@ -1,14 +1,3 @@
-#example:
-# 1
-# 00:00:00,000 --> 00:00:00,033
-# <font size="36">FrameCnt : 1, DiffTime : 33ms
-# 2019-09-25 01:22:35,085,332
-# [iso : 110] [shutter : 1/200.0] [fnum : 280] [ev : 0.7] [ct : 5064] [color_md : default] [focal_len : 240] [latitude: 0.608553] [longtitude: -1.963763] [altitude: 1429.697998] </font>
-
-# 2
-# <font size="36">FrameCnt : 2, DiffTime : 33ms
-# [iso : 110] [shutter : 1/200.0] [fnum : 280] [ev : 0.7] [ct : 5064] [color_md : default] [focal_len : 240] [latitude: 0.608553] [longtitude: -1.963763] [altitude: 1429.697998] </font>
-
 from datetime import timedelta
 from dateutil import parser as dup
 import re
@@ -18,19 +7,19 @@ import os
 from .parser import Parser
 from .telemetry import Telemetry
 from .packet import Packet
-# import open_telemetry_kit.element as element
 from .element import Element, UnknownElement
-from .element import TimestampElement, TimeframeBeginElement, TimeframeEndElement
+from .element import TimestampElement, TimeframeBeginElement, TimeframeEndElement, DatetimeElement
 from .element import LatitudeElement, LongitudeElement, AltitudeElement
 import open_telemetry_kit.detector as detector
 
 class SRTParser(Parser):
   ext = "srt"
 
-  def __init__(self, source: str, is_embedded: bool = False):
+  def __init__(self, source: str, is_embedded: bool = False, convert_to_epoch: bool = False):
     super().__init__(source)
     self.is_embedded = is_embedded
     self.beg_timestamp = 0
+    self.convert_to_epoch = convert_to_epoch
 
   def read(self) -> Telemetry:
     if self.is_embedded:
@@ -77,29 +66,34 @@ class SRTParser(Parser):
     #   1+ digits, 1+ whitespace, 1+ digits, ':' 1+ digits,
     #   ':', 1+ digits, '.' or ',', any amount of whitespace, any number of digits, 
     #   the same separator previously found, any amount of whitespace, any number of digits 
-    ts = re.search(r"\d+([\/\-\.])\d+\1\d+\s+\d+:\d+:\d+([.,])?\s*\d*\2?\s*\d*", block)
+    dt = re.search(r"\d+([\/\-\.])\d+\1\d+\s+\d+:\d+:\d+([.,])?\s*\d*\2?\s*\d*", block)
 
     # dateutil is pretty good, but can't handle the double microsecond separator 
     # that sometimes shows up in DJIs telemetry so check to see if it exists and get rid of it
     # Also, convert to epoch microseconds while we're at it
     # TODO: conversion to epoch shouldn't be forced. Save as it's read in and add a funtion
     #       to convert if the user desires
-    if ts:
-      micro_syn = ts[2]
-      ts = ts[0]
-      if micro_syn and ts.count(micro_syn) > 1:
+    if dt:
+      micro_syn = dt[2]
+      dt = dt[0]
+      if micro_syn and dt.count(micro_syn) > 1:
         #concatentate timestamp pre-2nd separator with post-2nd separator
-        ts = ts[:ts.rfind(micro_syn)] + ts[ts.rfind(micro_syn)+1:]
+        dt = dt[:dt.rfind(micro_syn)] + dt[dt.rfind(micro_syn)+1:]
       
-      ts = int(dup.parse(ts).timestamp() * 1000)
-      packet["timestamp"] = TimestampElement(ts)
+      dt = int(dup.parse(dt))#.timestamp() * 1000)
+      if (self.convert_to_epoch):
+        dt = dt.timestamp() * 1000
+        packet["timestamp"] = TimestampElement(dt)
+      else:
+        packet["datetime"] = DatetimeElement(dt)
     
     elif self.is_embedded and self.beg_timestamp != 0:
       tfb = packet["timeframeBegin"].value
       tfe = packet["timeframeEnd"].value
-      ts = 500 * (tfb+tfe) #average and convert to microseconds (sum * 1000/2)
-      packet["timestamp"] = TimestampElement(self.beg_timestamp + ts)
+      dt = 500 * (tfb+tfe) #average and convert to microseconds (sum * 1000/2)
+      packet["timestamp"] = TimestampElement(self.beg_timestamp + dt)
 
+  # DJI
   # Looks for GPS telemetry of the form:
   # GPS(-122.3699,37.5929,19) BAROMETER:64.3 //(long, lat) OR
   # GPS(37.8757,-122.3061,0.0M) BAROMETER:36.9M //(lat, long)
@@ -131,6 +125,7 @@ class SRTParser(Parser):
     
     packet["altitude"] = AltitudeElement(alt.strip(' ,():M\n'))
 
+  # DJI
   # Looks for telemetry of the form:
   # [iso : 110] [shutter : 1/200.0] [fnum : 280] [ev : 0.7] [ct : 5064] [color_md : default] [focal_len : 240] [latitude: 0.608553] [longtitude: -1.963763] [altitude: 1429.697998] 
   def _extractData(self, block: str, packet: Dict[str, Element]):

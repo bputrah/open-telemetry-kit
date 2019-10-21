@@ -37,7 +37,7 @@ The OTK package can be imported into your python3 project with:
 
 #### Download the OTK Quickstart package with sample data
 
-1. Download the OTK quickstart package (~90 MB).
+Download the OTK quickstart package (~90 MB).
 (Mac users can install `wget` using [these instructions](https://www.maketecheasier.com/install-wget-mac/))
 
 >$ wget https://hivemapper-sample-videos.s3-us-west-2.amazonaws.com/OTK/OTK_quickstart.tgz
@@ -45,7 +45,7 @@ The OTK package can be imported into your python3 project with:
 This includes a sample `.csv`, `.srt`, and `.mov` with embedded telemetry.
 It also contains `quickstart.py` which you can use to extract the telemetry from the sample files.
 
-2. Extract the package:
+Extract the package:
 
 >$ tar xzvf OTK_quickstart.tgz
 
@@ -56,15 +56,15 @@ It will read in the data, convert it to JSON, and write it to the provided desti
 
 #### Telemetry extraction and conversion example
 
-1. In your terminal go to the new `OTK_quickstart` directory.
+In your terminal go to the new `OTK_quickstart` directory.
 
-2. Extract telemetry from the sample video:
+Extract telemetry from the sample video:
 
 >$ python3 quickstart.py embedded_srt_example.mov embedded_srt_example.json
 
 Note: Because the telemetry is embedded, this script will create a `metadata.json` file and extract the data into `[video_name].srt`. This will not happen with standalone telemetry files like in the examples below.
 
-3. Extract telemetry from the sample `srt` or `csv` files respectively:
+Extract telemetry from the sample `srt` or `csv` files respectively:
 
 >$ python3 quickstart.py srt_example.srt srt_example.json
 
@@ -76,7 +76,7 @@ The data is organized into an array of objects (or, in python terminology, a lis
 
 #### Data manipulation example
 
-1. For an example of simple data manipulation, open `quickstart.py` and uncomment the lines:
+For an example of simple data manipulation, open `quickstart.py` and uncomment the lines:
 
 ```
 # gps = Telemetry()
@@ -86,7 +86,7 @@ The data is organized into an array of objects (or, in python terminology, a lis
 # write.telemetryToJson(gps, dest)
 ```
 
-2. Rerun the script with one of the provided commands above.
+Rerun the script with one of the provided commands above.
 
 ### Current Functionality
 #### Input Formats

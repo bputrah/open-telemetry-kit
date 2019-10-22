@@ -4,8 +4,9 @@ from .telemetry import Telemetry
 from .element import Element
 
 class Parser(metaclass=ABCMeta):
-  def __init__(self, source):
+  def __init__(self, source, require_timestamp: bool = False):
     self.source = source
+    self.require_timestamp = require_timestamp
     self.element_dict = {}
     for cls in Element.__subclasses__():
       for name in cls.names:

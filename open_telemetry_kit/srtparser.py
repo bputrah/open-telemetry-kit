@@ -11,7 +11,7 @@ from dateutil import parser as dup
 import re
 import os
 from typing import Dict
-
+import logging
 
 class SRTParser(Parser):
   ext = "srt"
@@ -25,6 +25,7 @@ class SRTParser(Parser):
     self.is_embedded = is_embedded
     self.beg_timestamp = 0
     self.convert_to_epoch = convert_to_epoch
+    self.logger = logging.getLogger("SRTParser")
 
   def read(self) -> Telemetry:
     tel = Telemetry()
@@ -33,8 +34,14 @@ class SRTParser(Parser):
     if self.is_embedded and ext != ".srt":
       if self.require_timestamp:
         video_metadata = detector.read_video_metadata(self.source)
-        video_datetime = video_metadata["streams"][0]["tags"]["creation_time"]
-        self.beg_timestamp = int(dup.parse(video_datetime).timestamp() * 1000)
+        if video_metadata and "streams" in video_metadata \
+           and "tags" in video_metadata["streams"][0]     \
+           and "creation_time" in video_metadata["streams"][0]["tags"]:
+
+          video_datetime = video_metadata["streams"][0]["tags"]["creation_time"]
+          self.beg_timestamp = int(dup.parse(video_datetime).timestamp() * 1000)
+        else:
+          self.logger.warn("Could not find creation time for video.")
 
       srt = detector.read_embedded_subtitles(self.source)
       self._process(srt.splitlines(True), tel)
@@ -42,6 +49,9 @@ class SRTParser(Parser):
     else:
       with open(self.source, 'r') as srt:
         self._process(srt, tel)
+
+    if len(tel) == 0:
+      self.logger.warn("No telemetry was found. Returning empty Telemetry()")
 
     return tel
 
@@ -55,7 +65,11 @@ class SRTParser(Parser):
         self._extractTimeframe(block[sec_line_beg: sec_line_end], packet)
         self._extractTimestamp(block[sec_line_end + 1 :], packet)
         self._extractData(block[sec_line_end + 1:], packet)
-        tel.append(packet)
+        if len(packet) > 0:
+          self.logger.info("Adding new packet.")
+          tel.append(packet)
+        else:
+          self.logger.warn("No telemetry was found in block. Packet is empty, skipping.")
         block = ""
       elif line == '\n':
         continue
@@ -66,10 +80,15 @@ class SRTParser(Parser):
   # 00:00:00,033 --> 00:00:00,066
   def _extractTimeframe(self, line: str, packet: Dict[str, Element]):
     sep_pos = line.find("-->")
-    tfb = (dup.parse(line[:sep_pos].strip()) - dup.parse("00:00:00")).total_seconds()
-    packet["timeframeBegin"] = TimeframeBeginElement(tfb)
-    tfe = (dup.parse(line[sep_pos+3:].strip()) - dup.parse("00:00:00")).total_seconds()
-    packet["timeframeEnd"] = TimeframeEndElement(tfe)
+    if sep_pos > -1:
+      tfb = (dup.parse(line[:sep_pos].strip()) - dup.parse("00:00:00")).total_seconds()
+      packet[TimeframeBeginElement.name] = TimeframeBeginElement(tfb)
+      tfe = (dup.parse(line[sep_pos+3:].strip()) - dup.parse("00:00:00")).total_seconds()
+      packet[TimeframeEndElement.name] = TimeframeEndElement(tfe)
+    else:
+      # Timeframes in this format are one of the few defined requirements in srt
+      # If one wasn't found either parsing failed or this file doesn't follow the standard
+      self.logger.error("No timeframe was found. It is likely something went wrong with parsing")
 
   # Example timestamp
   # 2019-09-25 01:22:35,118,697
@@ -95,15 +114,21 @@ class SRTParser(Parser):
       dt = int(dup.parse(dt))#.timestamp() * 1000)
       if (self.convert_to_epoch):
         dt = dt.timestamp() * 1000
-        packet["timestamp"] = TimestampElement(dt)
+        packet[TimestampElement.name] = TimestampElement(dt)
       else:
-        packet["datetime"] = DatetimeElement(dt)
+        packet[DatetimeElement.name] = DatetimeElement(dt)
     
-    elif self.is_embedded and self.beg_timestamp != 0:
-      tfb = packet["timeframeBegin"].value
-      tfe = packet["timeframeEnd"].value
-      dt = 500 * (tfb+tfe) #average and convert to microseconds (sum * 1000/2)
-      packet["timestamp"] = TimestampElement(self.beg_timestamp + dt)
+    elif self.require_timestamp:
+      if self.beg_timestamp != 0:
+        logging.info("Using timeframe and video creation time to estimate timestamp")
+        tfb = packet[TimeframeBeginElement.name].value
+        tfe = packet[TimeframeEndElement.name].value
+        dt = 500 * (tfb+tfe) #average and convert to microseconds (sum * 1000/2)
+        packet[TimestampElement.name] = TimestampElement(self.beg_timestamp + dt)
+
+      else:
+        self.logger.error("Could not find any time elements when require_timestamp was set")
+        raise Exception("No timestamp or datetime found with 'require_timestamp' set to true.")
 
   # DJI
   # Looks for GPS telemetry of the form:
@@ -120,12 +145,12 @@ class SRTParser(Parser):
     val2 = block[val1_end : val2_end]
     # lat, long
     if 'M' == block[gps_end - 1]:
-      packet["latitude"] = LatitudeElement(val1.strip(" ,()"))
-      packet["longitude"] = LongitudeElement(val2.strip(" ,()"))
+      packet[LatitudeElement.name] = LatitudeElement(val1.strip(" ,()"))
+      packet[LongitudeElement.name] = LongitudeElement(val2.strip(" ,()"))
     #long, lat
     else:
-      packet["longitude"] = LatitudeElement(val1.strip(" ,()"))
-      packet["latitude"] = LongitudeElement(val2.strip(" ,()"))
+      packet[LongitudeElement.name] = LatitudeElement(val1.strip(" ,()"))
+      packet[LatitudeElement.name] = LongitudeElement(val2.strip(" ,()"))
 
     alt = block[val2_end : gps_end]
 
@@ -135,7 +160,7 @@ class SRTParser(Parser):
       bar_end = bar_pos + 9 #len("BAROMETER")
       alt = block[bar_end : end_line]
     
-    packet["altitude"] = AltitudeElement(alt.strip(' ,():M\n'))
+    packet[AltitudeElement.name] = AltitudeElement(alt.strip(' ,():M\n'))
 
   # DJI
   # Looks for telemetry of the form:
@@ -162,4 +187,8 @@ class SRTParser(Parser):
           element_cls = self.element_dict[key]
           packet[element_cls.name] = element_cls(data[i+1])
         else:
+          self.logger.warn("Adding unknown element ({} : {})".format(key, data[i+1]))
           packet[key] = UnknownElement(data[i+1])
+
+    if LatitudeElement.name not in packet or LongitudeElement.name not in packet:
+      self.logger.warn("Could not find GPS data.")

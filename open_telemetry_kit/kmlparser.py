@@ -1,23 +1,28 @@
 from .parser import Parser
 from .telemetry import Telemetry
 from .packet import Packet
-from .element import LatitudeElement, LongitudeElement, AltitudeElement, DatetimeElement
-from typing import List
+from .element import LatitudeElement, LongitudeElement, AltitudeElement
+from .element import TimestampElement, DatetimeElement
 
 import io
 import xml.etree.ElementTree as ET
+import logging
+from typing import List
 
 class KMLParser(Parser):
   ext = 'kml'
 
-  def __init__(self, source: str):
+  def __init__(self, source: str, require_timestamp: bool = False):
     super().__init__(source)
     self.ns = dict()
+    self.logger = logging.getLogger("KMLParser")
 
   def read(self):
     tel = Telemetry()
     tree = ET.parse(self.source)
     self._traverse_tree(tree.getroot(), tel)
+    if len(tel) == 0:
+      self.logger.warn("No telemetry was found. Returning empty Telemetry()")
     return tel
 
   def _traverse_tree(self, node: ET.Element, tel: Telemetry):
@@ -35,7 +40,18 @@ class KMLParser(Parser):
       packet = Packet()
       coords = line.strip().split(',')
       self._process_coords(coords, packet)
-      tel.append(packet)
+
+      if self.require_timestamp and TimestampElement.name not in packet \
+          and DatetimeElement.name not in packet:
+
+        self.logger.error("Could not find any time elements when require_timestamp was set")
+        raise Exception("No timestamp or datetime found with 'require_timestamp' set to true.")
+
+      if len(packet) > 0:
+        self.logger.info("Adding new packet.")
+        tel.append(packet)
+      else:
+        self.logger.warn("No telemetry was found in node. Packet is empty, skipping.")
 
   def _read_track(self, node: ET.Element, tel: Telemetry):
     packets = []
@@ -43,13 +59,24 @@ class KMLParser(Parser):
       tag = child.tag[child.tag.find('}')+1:]
       if tag == "when":
         packet = Packet()
-        packet["datetime"] = DatetimeElement(child.text)
+        packet[DatetimeElement.name] = DatetimeElement(child.text)
         packets.append(packet)
       elif tag == "coord":
         packet = packets.pop(0)
         coords = child.text.split()
         self._process_coords(coords, packet)
-        tel.append(packet)
+
+        if self.require_timestamp and TimestampElement.name not in packet \
+            and DatetimeElement.name not in packet:
+
+          self.logger.error("Could not find any time elements when require_timestamp was set")
+          raise Exception("No timestamp or datetime found with 'require_timestamp' set to true.")
+
+        if len(packet) > 0:
+          self.logger.info("Adding new packet.")
+          tel.append(packet)
+        else:
+          self.logger.warn("No telemetry was found in node. Packet is empty, skipping.")
 
   def _process_coords(self, coords: List[str], packet: Packet):
       packet[LatitudeElement.name] = LatitudeElement(coords[0]) 

@@ -1,9 +1,3 @@
-from datetime import timedelta
-from dateutil import parser as dup
-import re
-from typing import Dict
-import os
-
 from .parser import Parser
 from .telemetry import Telemetry
 from .packet import Packet
@@ -12,41 +6,61 @@ from .element import TimestampElement, TimeframeBeginElement, TimeframeEndElemen
 from .element import LatitudeElement, LongitudeElement, AltitudeElement
 import open_telemetry_kit.detector as detector
 
+from datetime import timedelta
+from dateutil import parser as dup
+import re
+import os
+from typing import Dict
+
+
 class SRTParser(Parser):
   ext = "srt"
 
-  def __init__(self, source: str, is_embedded: bool = False, convert_to_epoch: bool = False):
-    super().__init__(source)
+  def __init__(self, 
+               source: str, 
+               is_embedded: bool = False, 
+               convert_to_epoch: bool = False, 
+               require_timestamp: bool = False):
+    super().__init__(source, require_timestamp)
     self.is_embedded = is_embedded
     self.beg_timestamp = 0
     self.convert_to_epoch = convert_to_epoch
 
   def read(self) -> Telemetry:
-    if self.is_embedded:
-      path, _, _ = detector.split_path(self.source)
-      metadata = detector.read_video_metadata(os.path.join(path, "metadata.json"))
-      datetime = metadata["streams"][0]["tags"]["creation_time"]
-      self.beg_timestamp = int(dup.parse(datetime).timestamp() * 1000)
-
     tel = Telemetry()
-    with open(self.source, 'r') as src:
-      block = ""
-      for line in src:
-        if line == '\n' and len(block) > 0:
-          packet = Packet()
-          sec_line_beg = block.find('\n') + 1
-          sec_line_end = block.find('\n', sec_line_beg)
-          self._extractTimeframe(block[sec_line_beg: sec_line_end], packet)
-          self._extractTimestamp(block[sec_line_end + 1 :], packet)
-          self._extractData(block[sec_line_end + 1:], packet)
-          tel.append(packet)
-          block = ""
-        elif line == '\n':
-          continue
-        else:
-          block += line
 
-      return tel
+    _, _, ext = detector.split_path(self.source)
+    if self.is_embedded and ext != ".srt":
+      if self.require_timestamp:
+        video_metadata = detector.read_video_metadata(self.source)
+        video_datetime = video_metadata["streams"][0]["tags"]["creation_time"]
+        self.beg_timestamp = int(dup.parse(video_datetime).timestamp() * 1000)
+
+      srt = detector.read_embedded_subtitles(self.source)
+      self._process(srt.splitlines(True), tel)
+
+    else:
+      with open(self.source, 'r') as srt:
+        self._process(srt, tel)
+
+    return tel
+
+  def _process(self, srt: str, tel: Telemetry):
+    block = ""
+    for line in srt:
+      if line == '\n' and len(block) > 0:
+        packet = Packet()
+        sec_line_beg = block.find('\n') + 1
+        sec_line_end = block.find('\n', sec_line_beg)
+        self._extractTimeframe(block[sec_line_beg: sec_line_end], packet)
+        self._extractTimestamp(block[sec_line_end + 1 :], packet)
+        self._extractData(block[sec_line_end + 1:], packet)
+        tel.append(packet)
+        block = ""
+      elif line == '\n':
+        continue
+      else:
+        block += line
 
   # Example timeframe:
   # 00:00:00,033 --> 00:00:00,066
@@ -71,8 +85,6 @@ class SRTParser(Parser):
     # dateutil is pretty good, but can't handle the double microsecond separator 
     # that sometimes shows up in DJIs telemetry so check to see if it exists and get rid of it
     # Also, convert to epoch microseconds while we're at it
-    # TODO: conversion to epoch shouldn't be forced. Save as it's read in and add a funtion
-    #       to convert if the user desires
     if dt:
       micro_syn = dt[2]
       dt = dt[0]

@@ -1,6 +1,6 @@
+from .parser import Parser
 import os
 import json
-from .parser import Parser
 from typing import Dict, Tuple, Union, List
 JSONType = Dict[str, Union[List[Dict[str, Union[str, int]]], Dict[str,Union[str, int]]]]
 

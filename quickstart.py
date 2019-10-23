@@ -3,6 +3,7 @@ import open_telemetry_kit.detector as detector
 from open_telemetry_kit.telemetry import Telemetry
 
 import sys
+import logging
 
 # Read in source file and output file
 source = sys.argv[1]
@@ -19,6 +20,22 @@ dest = sys.argv[2]
 # An Element contains the actual value of the reading.
 # There is also a small library of functions used for telemetry type detection
 #    as well as writing the Telemetry to a new file.
+
+# To enable logging uncomment this block.
+# Details on loggin can be found in the official Python documentation
+# In general the will log all INFO messages and above to OTK.log
+# Error messages and above will be printed to the console
+# logger = logging.getLogger("OTK") # <- This top level logger must be name "OTK" or logging will not work 
+# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# logger.setLevel(logging.INFO)
+# fh = logging.FileHandler("OTK.log")
+# fh.setLevel(logging.INFO)
+# fh.setFormatter(formatter)
+# logger.addHandler(fh)
+# sh = logging.StreamHandler()
+# sh.setLevel(logging.ERROR)
+# sh.setFormatter(formatter)
+# logger.addHandler(fh)
 
 # Create Parser object used to parse source file
 parser = detector.create_telemetry_parser(source)

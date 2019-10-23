@@ -15,7 +15,7 @@ class KMLParser(Parser):
   def __init__(self, source: str, require_timestamp: bool = False):
     super().__init__(source)
     self.ns = dict()
-    self.logger = logging.getLogger("KMLParser")
+    self.logger = logging.getLogger("OTK.KMLParser")
 
   def read(self):
     tel = Telemetry()

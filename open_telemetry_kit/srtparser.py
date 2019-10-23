@@ -25,7 +25,7 @@ class SRTParser(Parser):
     self.is_embedded = is_embedded
     self.beg_timestamp = 0
     self.convert_to_epoch = convert_to_epoch
-    self.logger = logging.getLogger("SRTParser")
+    self.logger = logging.getLogger("OTK.SRTParser")
 
   def read(self) -> Telemetry:
     tel = Telemetry()

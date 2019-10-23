@@ -13,7 +13,7 @@ class GPXParser(Parser):
 
   def __init__(self, source, require_timestamp: bool = False):
     super().__init__(source, require_timestamp)
-    self.logger = logging.getLogger("GPXParser")
+    self.logger = logging.getLogger("OTK.GPXParser")
 
   def read(self):
     tree = ET.parse(self.source)

@@ -12,7 +12,7 @@ class CSVParser(Parser):
 
   def __init__(self, source: str, require_timestamp: bool = False):
     super().__init__(source, require_timestamp)
-    self.logger = logging.getLogger("CSVParser")
+    self.logger = logging.getLogger("OTK.CSVParser")
 
   def read(self) -> Telemetry:
     tel = Telemetry()

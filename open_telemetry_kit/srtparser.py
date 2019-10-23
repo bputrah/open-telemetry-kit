@@ -190,5 +190,7 @@ class SRTParser(Parser):
           self.logger.warn("Adding unknown element ({} : {})".format(key, data[i+1]))
           packet[key] = UnknownElement(data[i+1])
 
-    if LatitudeElement.name not in packet or LongitudeElement.name not in packet:
-      self.logger.warn("Could not find GPS data.")
+    if LatitudeElement.name not in packet or  \
+       LongitudeElement.name not in packet or \
+       AltitudeElement.name not in packet:
+      self.logger.warn("No or only partial GPS data found")

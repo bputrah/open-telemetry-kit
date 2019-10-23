@@ -62,7 +62,7 @@ def create_telemetry_parser(src: str) -> Parser:
   tel_type, embedded = get_telemetry_type(src)
 
   for cls in Parser.__subclasses__():
-    if tel_type == cls.ext:
+    if tel_type == cls.tel_type:
       logger.info("Creating parser objecet: {}".format(cls.__name__))
       if not embedded:
         return cls(src)

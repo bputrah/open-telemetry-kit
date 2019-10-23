@@ -1,5 +1,4 @@
 name = "open_telemetry_kit"
-from . import logger
 from .parser import Parser
 from .csvparser import CSVParser
 from .srtparser import SRTParser

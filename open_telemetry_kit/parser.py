@@ -1,7 +1,7 @@
-from abc import ABCMeta
-from abc import abstractmethod
 from .telemetry import Telemetry
 from .element import Element
+from abc import ABCMeta
+from abc import abstractmethod
 
 class Parser(metaclass=ABCMeta):
   def __init__(self, source, require_timestamp: bool = False):

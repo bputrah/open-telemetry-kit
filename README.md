@@ -62,9 +62,6 @@ Extract telemetry from the sample video:
 
 >$ python3 quickstart.py embedded_srt_example.mov embedded_srt_example.json
 
-
-_Note: Because the telemetry is embedded, this script will create a `metadata.json` file and extract the data into `[video_name].srt`. This will not happen with standalone telemetry files like in the examples below._
-
 Extract telemetry from the sample `srt` or `csv` files respectively:
 
 >$ python3 quickstart.py srt_example.srt srt_example.json
@@ -96,6 +93,8 @@ The OTK currently supports the following forms of telemetry:
 - `.csv` files
 - `.srt` files
 - Any video file with embedded telemetry encoded as a `.srt` (e.g. video taken with some DJI drone models)
+- `.gpx` files
+- `.kml` files
 
 #### Output Formats
 - JSON
@@ -104,14 +103,11 @@ The OTK currently supports the following forms of telemetry:
 Planned expansions and updates for the OTK include:
 
 #### Input Formats
-- `.kml`
-- `.gpx`
+- Open Camera `.srt`
 - KLV/MISB embedded data
 
 #### Output Formats
 - geoJSON
 
 #### Other
-- Logging
-- Error checking
 - Unit Tests

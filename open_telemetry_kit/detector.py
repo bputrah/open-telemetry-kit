@@ -60,14 +60,14 @@ def get_telemetry_type(src: str) -> Tuple[str, bool]:
     
 def create_telemetry_parser(src: str) -> Parser:
   tel_type, embedded = get_telemetry_type(src)
-  tel_src = src
 
   for cls in Parser.__subclasses__():
     if tel_type == cls.ext:
+      logger.info("Creating parser objecet: {}".format(cls.__name__))
       if not embedded:
-        return cls(tel_src)
+        return cls(src)
       else:
-        return cls(tel_src, is_embedded=embedded)
+        return cls(src, is_embedded=embedded)
 
 def read_embedded_subtitles(src: str) -> str:
   cmd = "ffmpeg -y -i " + src + " -f srt - " 

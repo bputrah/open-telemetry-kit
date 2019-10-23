@@ -8,7 +8,7 @@ import csv
 import logging
 
 class CSVParser(Parser):
-  ext = "csv"
+  tel_type = "csv"
 
   def __init__(self, source: str, require_timestamp: bool = False):
     super().__init__(source, require_timestamp)

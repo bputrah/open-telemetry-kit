@@ -10,7 +10,7 @@ import logging
 from typing import List
 
 class KMLParser(Parser):
-  ext = 'kml'
+  tel_type = 'kml'
 
   def __init__(self, source: str, require_timestamp: bool = False):
     super().__init__(source)

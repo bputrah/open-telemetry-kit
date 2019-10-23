@@ -9,7 +9,7 @@ import logging
 
 # Reference: http://www.topografix.com/GPX/1/1/
 class GPXParser(Parser):
-  ext = 'gpx'
+  tel_type = 'gpx'
 
   def __init__(self, source, require_timestamp: bool = False):
     super().__init__(source, require_timestamp)

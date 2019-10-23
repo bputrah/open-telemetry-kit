@@ -21,7 +21,7 @@ class Parser(metaclass=ABCMeta):
   @property
   @classmethod
   @abstractmethod
-  def ext(self) -> str:
+  def tel_type(self) -> str:
     pass
 
   @abstractmethod

@@ -14,7 +14,7 @@ from typing import Dict
 import logging
 
 class SRTParser(Parser):
-  ext = "srt"
+  tel_type = "srt"
 
   def __init__(self, 
                source: str, 

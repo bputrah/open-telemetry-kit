@@ -111,9 +111,8 @@ class SRTParser(Parser):
         #concatentate timestamp pre-2nd separator with post-2nd separator
         dt = dt[:dt.rfind(micro_syn)] + dt[dt.rfind(micro_syn)+1:]
       
-      dt = int(dup.parse(dt))#.timestamp() * 1000)
       if (self.convert_to_epoch):
-        dt = dt.timestamp() * 1000
+        dt = int(dup.parse(dt).timestamp() * 1000)
         packet[TimestampElement.name] = TimestampElement(dt)
       else:
         packet[DatetimeElement.name] = DatetimeElement(dt)

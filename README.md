@@ -34,12 +34,16 @@ The OTK package can be imported into your python3 project with:
 >import open_telemetry_kit as otk
 
 ### Quick Start
-For an example of OTK usage you can download the OTK quickstart package (~90 MB).
-This includes a sample `.csv`, `.srt`, and `.mov` with embedded telemetry.
-It also contains `quickstart.py` which you can use to extract the telemetry from the sample files.
+
+#### Download the OTK Quickstart package with sample data
+
+Download the OTK quickstart package (~90 MB).
 (Mac users can install `wget` using [these instructions](https://www.maketecheasier.com/install-wget-mac/))
 
 >$ wget https://hivemapper-sample-videos.s3-us-west-2.amazonaws.com/OTK/OTK_quickstart.tgz
+
+This includes a sample `.csv`, `.srt`, and `.mov` with embedded telemetry.
+It also contains `quickstart.py` which you can use to extract the telemetry from the sample files.
 
 Extract the package:
 
@@ -50,7 +54,9 @@ This will extract everything into a new directory called `OTK_quickstart/`
 The `quickstart.py` script accepts a standalone `.csv` or `.srt` or a video file with an embedded `.srt`. 
 It will read in the data, convert it to JSON, and write it to the provided destination. 
 
-From the new OTK_quickstart directory, you can execute the script via one of the following commands.
+#### Telemetry extraction and conversion example
+
+In your terminal go to the new `OTK_quickstart` directory.
 
 Extract telemetry from the sample video:
 
@@ -62,8 +68,12 @@ Extract telemetry from the sample `srt` or `csv` files respectively:
 
 >$ python3 quickstart.py csv_example.csv csv_example.json
 
-This process will create a new JSON file containing the telemetry extracted from the sample file.
-The data is organized into an array of objects (or, in python terminology, a list of dictionaries)
+
+_Note: This process will create a new JSON file containing the telemetry extracted from the sample file.
+The data is organized into an array of objects (or, in python terminology, a list of dictionaries)_
+
+
+#### Data manipulation example
 
 For an example of simple data manipulation, open `quickstart.py` and uncomment the lines:
 
@@ -75,7 +85,7 @@ For an example of simple data manipulation, open `quickstart.py` and uncomment t
 # write.telemetryToJson(gps, dest)
 ```
 
-Then rerun the script with one of the provided commands.
+Rerun the script with one of the provided commands above.
 
 ### Current Functionality
 #### Input Formats

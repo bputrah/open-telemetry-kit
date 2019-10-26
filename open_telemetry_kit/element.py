@@ -105,8 +105,8 @@ class PlatformDesignationElement(Element):
   names = {"platformDesignation", "PlatformDesignation", "platformdesignation",
            "Platform Designation", "platform designation", "platform", "model"}
 
-  def __init__(self, value: float):
-    self.value = float(value)
+  def __init__(self, value: str):
+    self.value = value
 
 class ImageSourceSensorElement(Element):
   name = "imageSourceSensor"

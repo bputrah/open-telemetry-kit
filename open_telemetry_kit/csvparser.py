@@ -5,13 +5,16 @@ from .element import UnknownElement
 from .element import TimestampElement, DatetimeElement
 
 import csv
+from dateutil import parser as dup
 import logging
 
 class CSVParser(Parser):
   tel_type = "csv"
 
-  def __init__(self, source: str, require_timestamp: bool = False):
-    super().__init__(source, require_timestamp)
+  def __init__(self, source: str, 
+               convert_to_epoch: bool = False,
+               require_timestamp: bool = False):
+    super().__init__(source, convert_to_epoch, require_timestamp)
     self.logger = logging.getLogger("OTK.CSVParser")
 
   def read(self) -> Telemetry:
@@ -25,7 +28,12 @@ class CSVParser(Parser):
           if key in self.element_dict:
             #element_dict[key] returns a class
             element_cls = self.element_dict[key]
-            packet[element_cls.name] = element_cls(val)
+            if element_cls == DatetimeElement and self.convert_to_epoch:
+              val = int(dup.parse(val).timestamp() * 1000)
+              packet[TimestampElement.name] = TimestampElement(val)
+            else:
+              packet[element_cls.name] = element_cls(val)
+
           else:
             self.logger.warn("Adding unknown element ({} : {})".format(key, val))
             packet[key] = UnknownElement(val)

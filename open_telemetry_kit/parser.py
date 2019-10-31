@@ -4,8 +4,11 @@ from abc import ABCMeta
 from abc import abstractmethod
 
 class Parser(metaclass=ABCMeta):
-  def __init__(self, source, require_timestamp: bool = False):
+  def __init__(self, source, 
+               convert_to_epoch: bool = False,
+               require_timestamp: bool = False):
     self.source = source
+    self.convert_to_epoch = convert_to_epoch
     self.require_timestamp = require_timestamp
     self.element_dict = {}
     for cls in Element.__subclasses__():

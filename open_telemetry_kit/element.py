@@ -74,10 +74,19 @@ class PlatformHeadingAngleElement(Element):
     self.value = float(value)
 
 class PlatformPitchAngleElement(Element):
-  name = "platformPitchAngle"
-  names = {"platformPitchAngle", "PlatformPitchAngle", "platformpitchangle",
-           "pitchAngle", "PitchAngle", "pitchangle", "Pitch Angle", "pitch angle",
-           "pitch", "Pitch"}
+  name = "platformPitchAngleShort"
+  names = {"platformPitchAngleShort", "PlatformPitchAngleShort", "platformpitchangleshort",
+           "pitchAngleShort", "PitchAngleShort", "pitchangleshort", "Pitch Angle Short", 
+           "pitch angle short"}
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class PlatformPitchAngleFullElement(Element):
+  name = "platformPitchAngleFull"
+  names = {"platformPitchAngleFull", "PlatformPitchAngleFull", "platformpitchangleFull",
+           "pitchAngleFull", "PitchAngleFull", "pitchanglefull", "Pitch Angle Full", 
+           "pitch angle full", "pitch", "Pitch"}
 
   def __init__(self, value: float):
     self.value = float(value)
@@ -95,7 +104,7 @@ class PlatformRollAngleFullElement(Element):
   name = "platformRollAngleFull"
   names = {"platformRollAngleFull", "PlatformRollAngleFull", "platformrollanglefull",
            "rollAngleFull", "RollAngleFull", "rollanglefull", "Roll Angle Full",
-           "roll angle full", "roll full", "Roll Full"}
+           "roll angle full", "roll full", "Roll Full", "roll", "Roll"}
 
   def __init__(self, value: float):
     self.value = float(value)

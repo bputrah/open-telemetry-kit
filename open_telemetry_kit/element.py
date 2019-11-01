@@ -74,10 +74,19 @@ class PlatformHeadingAngleElement(Element):
     self.value = float(value)
 
 class PlatformPitchAngleElement(Element):
-  name = "platformPitchAngle"
-  names = {"platformPitchAngle", "PlatformPitchAngle", "platformpitchangle",
-           "pitchAngle", "PitchAngle", "pitchangle", "Pitch Angle", "pitch angle",
-           "pitch", "Pitch"}
+  name = "platformPitchAngleShort"
+  names = {"platformPitchAngleShort", "PlatformPitchAngleShort", "platformpitchangleshort",
+           "pitchAngleShort", "PitchAngleShort", "pitchangleshort", "Pitch Angle Short", 
+           "pitch angle short"}
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class PlatformPitchAngleFullElement(Element):
+  name = "platformPitchAngleFull"
+  names = {"platformPitchAngleFull", "PlatformPitchAngleFull", "platformpitchangleFull",
+           "pitchAngleFull", "PitchAngleFull", "pitchanglefull", "Pitch Angle Full", 
+           "pitch angle full", "pitch", "Pitch"}
 
   def __init__(self, value: float):
     self.value = float(value)
@@ -95,7 +104,7 @@ class PlatformRollAngleFullElement(Element):
   name = "platformRollAngleFull"
   names = {"platformRollAngleFull", "PlatformRollAngleFull", "platformrollanglefull",
            "rollAngleFull", "RollAngleFull", "rollanglefull", "Roll Angle Full",
-           "roll angle full", "roll full", "Roll Full"}
+           "roll angle full", "roll full", "Roll Full", "roll", "Roll"}
 
   def __init__(self, value: float):
     self.value = float(value)
@@ -181,7 +190,8 @@ class SensorHorizontalFOVElement(Element):
   name = "sensorHorizontalFOV"
   names = {"sensorHorizontalFOV", "SensorHorizontalFOV", "sensorhorizontalfov",
            "Sensor Horizontal FOV", "sensor horizontal FOV", "sensor horizontal fov",
-           "Horizontal FOV", "horizontal FOV", "horizontal fov", "Horizontal FOV (deg)"}
+           "Horizontal FOV", "horizontal FOV", "horizontal fov", "Horizontal FOV (deg)",
+           "sensorHorizontalFov"}
 
   def __init__(self, value: float):
     self.value = float(value)
@@ -190,7 +200,8 @@ class SensorVerticalFOVElement(Element):
   name = "sensorVerticalFOV"
   names = {"sensorVerticalFOV", "SensorVerticalFOV", "sensorverticalfov",
            "Sensor Vertical FOV", "sensor vertical FOV", "sensor vertical fov",
-           "Vertical FOV", "vertical FOV", "vertical fov", "Vertical FOV (deg)"}
+           "Vertical FOV", "vertical FOV", "vertical fov", "Vertical FOV (deg)",
+           "sensorVerticalFov"}
 
   def __init__(self, value: float):
     self.value = float(value)
@@ -269,7 +280,8 @@ class FrameCenterElevationElement(Element):
   name = "frameCenterAltitude"
   names = {"frameCenterAltitude", "FrameCenterAltitude", "framecenteraltitude",
            "Frame Center Altitude", "frame center altitude", "Center Altitude",
-           "center altitude", "Center Altitude (m)"}
+           "center altitude", "Center Altitude (m)", "frameCenterElevation",
+           "FrameCenterElevation", "framecenterelevation"}
 
   def __init__(self, value: float):
     self.value = float(value)
@@ -286,7 +298,7 @@ class FrameCenterHeightAboveEllipsoidElement(Element):
 class UASLocalSetVersionElement(Element):
   name = "UASLocalSetVersion"
   names = {"UASLocalSetVersion", "uaslocalsetversion", "UAS Local Set Version",
-           "uas local set version"}
+           "uas local set version", "uasLocalSetVersion"}
 
   def __init__(self, value: int):
     self.value = int(value)

@@ -6,14 +6,17 @@ from .element import TimestampElement, DatetimeElement
 
 import io
 import xml.etree.ElementTree as ET
+from dateutil import parser as dup
 import logging
 from typing import List
 
 class KMLParser(Parser):
   tel_type = 'kml'
 
-  def __init__(self, source: str, require_timestamp: bool = False):
-    super().__init__(source)
+  def __init__(self, source: str, 
+               convert_to_epoch: bool = False,
+               require_timestamp: bool = False):
+    super().__init__(source, convert_to_epoch, require_timestamp)
     self.ns = dict()
     self.logger = logging.getLogger("OTK.KMLParser")
 
@@ -59,7 +62,11 @@ class KMLParser(Parser):
       tag = child.tag[child.tag.find('}')+1:]
       if tag == "when":
         packet = Packet()
-        packet[DatetimeElement.name] = DatetimeElement(child.text)
+        if self.convert_to_epoch:
+          val = int(dup.parse(child.text).timestamp() * 1000)
+          packet[TimestampElement.name] = TimestampElement(val)
+        else:
+          packet[DatetimeElement.name] = DatetimeElement(child.text)
         packets.append(packet)
       elif tag == "coord":
         packet = packets.pop(0)

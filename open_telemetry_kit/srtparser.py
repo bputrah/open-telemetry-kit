@@ -123,7 +123,7 @@ class SRTParser(Parser):
     
     elif self.require_timestamp:
       if self.beg_timestamp != 0:
-        logging.info("No datetime was found. Using timeframe and video creation time to estimate timestamp")
+        self.logger.info("No datetime was found. Using timeframe and video creation time to estimate timestamp")
         tfb = packet[TimeframeBeginElement.name].value
         tfe = packet[TimeframeEndElement.name].value
         dt = 500 * (tfb+tfe) #average and convert to microseconds (sum * 1000/2)

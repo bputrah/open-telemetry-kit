@@ -21,7 +21,9 @@ class SRTParser(Parser):
                is_embedded: bool = False, 
                convert_to_epoch: bool = False, 
                require_timestamp: bool = False):
-    super().__init__(source, require_timestamp)
+    super().__init__(source, 
+                     convert_to_epoch = convert_to_epoch, 
+                     require_timestamp = require_timestamp)
     self.is_embedded = is_embedded
     self.beg_timestamp = 0
     self.convert_to_epoch = convert_to_epoch
@@ -40,6 +42,7 @@ class SRTParser(Parser):
 
           video_datetime = video_metadata["streams"][0]["tags"]["creation_time"]
           self.beg_timestamp = int(dup.parse(video_datetime).timestamp() * 1000)
+          self.logger.info("Setting video creation time to: {}".format(self.beg_timestamp))
         else:
           self.logger.warn("Could not find creation time for video.")
 
@@ -112,6 +115,7 @@ class SRTParser(Parser):
         dt = dt[:dt.rfind(micro_syn)] + dt[dt.rfind(micro_syn)+1:]
       
       if (self.convert_to_epoch):
+        self.logger.info("Converting datetime to epoch")
         dt = int(dup.parse(dt).timestamp() * 1000)
         packet[TimestampElement.name] = TimestampElement(dt)
       else:
@@ -119,7 +123,7 @@ class SRTParser(Parser):
     
     elif self.require_timestamp:
       if self.beg_timestamp != 0:
-        logging.info("Using timeframe and video creation time to estimate timestamp")
+        logging.info("No datetime was found. Using timeframe and video creation time to estimate timestamp")
         tfb = packet[TimeframeBeginElement.name].value
         tfe = packet[TimeframeEndElement.name].value
         dt = 500 * (tfb+tfe) #average and convert to microseconds (sum * 1000/2)

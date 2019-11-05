@@ -16,7 +16,9 @@ class KMLParser(Parser):
   def __init__(self, source: str, 
                convert_to_epoch: bool = False,
                require_timestamp: bool = False):
-    super().__init__(source, convert_to_epoch, require_timestamp)
+    super().__init__(source, 
+                     convert_to_epoch = convert_to_epoch, 
+                     require_timestamp = require_timestamp)
     self.ns = dict()
     self.logger = logging.getLogger("OTK.KMLParser")
 

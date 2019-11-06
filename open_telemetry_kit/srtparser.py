@@ -16,7 +16,7 @@ import logging
 class SRTParser(Parser):
   tel_type = "srt"
 
-  def __init__(self, 
+  def __init__(self,
                source: str, 
                is_embedded: bool = False, 
                convert_to_epoch: bool = False, 
@@ -130,8 +130,7 @@ class SRTParser(Parser):
         packet[TimestampElement.name] = TimestampElement(self.beg_timestamp + avg)
 
       else:
-        self.logger.error("Could not find any time elements when require_timestamp was set")
-        raise Exception("No timestamp or datetime found with 'require_timestamp' set to true.")
+        self.logger.critical("Could not find any time elements when require_timestamp was set")
 
   # DJI
   # Looks for GPS telemetry of the form:

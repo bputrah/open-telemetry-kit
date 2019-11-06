@@ -66,7 +66,7 @@ class GPXParser(Parser):
       if key in self.element_dict:
         element_cls = self.element_dict[key]
         if element_cls == DatetimeElement and self.convert_to_epoch:
-          val = int(dup.parse(val).timestamp() * 1000)
+          val = dup.parse(val).timestamp()
           packet[TimestampElement.name] = TimestampElement(val)
         else:
           packet[element_cls.name] = element_cls(val)

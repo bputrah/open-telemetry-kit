@@ -41,7 +41,7 @@ class SRTParser(Parser):
            and "creation_time" in video_metadata["streams"][0]["tags"]:
 
           video_datetime = video_metadata["streams"][0]["tags"]["creation_time"]
-          self.beg_timestamp = int(dup.parse(video_datetime).timestamp() * 1000)
+          self.beg_timestamp = dup.parse(video_datetime).timestamp()
           self.logger.info("Setting video creation time to: {}".format(self.beg_timestamp))
         else:
           self.logger.warn("Could not find creation time for video.")
@@ -66,7 +66,7 @@ class SRTParser(Parser):
         sec_line_beg = block.find('\n') + 1
         sec_line_end = block.find('\n', sec_line_beg)
         self._extractTimeframe(block[sec_line_beg: sec_line_end], packet)
-        self._extractTimestamp(block[sec_line_end + 1 :], packet)
+        self._extractDatetime(block[sec_line_end + 1 :], packet)
         self._extractData(block[sec_line_end + 1:], packet)
         if len(packet) > 0:
           self.logger.info("Adding new packet.")
@@ -93,9 +93,9 @@ class SRTParser(Parser):
       # If one wasn't found either parsing failed or this file doesn't follow the standard
       self.logger.error("No timeframe was found. It is likely something went wrong with parsing")
 
-  # Example timestamp
+  # Example datetime
   # 2019-09-25 01:22:35,118,697
-  def _extractTimestamp(self, block: str, packet: Dict[str, Element]):
+  def _extractDatetime(self, block: str, packet: Dict[str, Element]):
     # This should find any reasonably formatted (and some not so reasonably formatted) datetimes
     # Looks for:
     # 1+ digits, '/', '-', or '.', 1+ digits, the same separator previously found
@@ -116,18 +116,18 @@ class SRTParser(Parser):
       
       if (self.convert_to_epoch):
         self.logger.info("Converting datetime to epoch")
-        dt = int(dup.parse(dt).timestamp() * 1000)
+        dt = dup.parse(dt).timestamp()
         packet[TimestampElement.name] = TimestampElement(dt)
       else:
         packet[DatetimeElement.name] = DatetimeElement(dt)
     
     elif self.require_timestamp:
       if self.beg_timestamp != 0:
-        logging.info("No datetime was found. Using timeframe and video creation time to estimate timestamp")
+        self.logger.info("No datetime was found. Using timeframe and video creation time to estimate timestamp")
         tfb = packet[TimeframeBeginElement.name].value
         tfe = packet[TimeframeEndElement.name].value
-        dt = 500 * (tfb+tfe) #average and convert to microseconds (sum * 1000/2)
-        packet[TimestampElement.name] = TimestampElement(self.beg_timestamp + dt)
+        avg = (tfb+tfe) / 2
+        packet[TimestampElement.name] = TimestampElement(self.beg_timestamp + avg)
 
       else:
         self.logger.error("Could not find any time elements when require_timestamp was set")

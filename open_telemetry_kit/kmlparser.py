@@ -65,7 +65,7 @@ class KMLParser(Parser):
       if tag == "when":
         packet = Packet()
         if self.convert_to_epoch:
-          val = int(dup.parse(child.text).timestamp() * 1000)
+          val = dup.parse(child.text).timestamp()
           packet[TimestampElement.name] = TimestampElement(val)
         else:
           packet[DatetimeElement.name] = DatetimeElement(child.text)

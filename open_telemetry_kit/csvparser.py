@@ -31,8 +31,19 @@ class CSVParser(Parser):
             #element_dict[key] returns a class
             element_cls = self.element_dict[key]
             if element_cls == DatetimeElement and self.convert_to_epoch:
-              val = int(dup.parse(val).timestamp() * 1000)
+              val = dup.parse(val).timestamp()
               packet[TimestampElement.name] = TimestampElement(val)
+            elif element_cls == TimestampElement:
+              if val.find('.') > 0: #probably a float in epoch seconds
+                packet[element_cls.name] = element_cls(val)
+
+              # Based on this SO post: https://bit.ly/2WMGOc1
+              elif len(val) >= 16: #probably microseconds
+                packet[element_cls.name] = element_cls(float(val) * 1e-6)
+              elif len(val) >= 13: #probably milliseconds
+                packet[element_cls.name] = element_cls(float(val) * 1e-3)
+              else: #probably seconds
+                packet[element_cls.name] = element_cls(val)
             else:
               packet[element_cls.name] = element_cls(val)
 

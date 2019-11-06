@@ -43,8 +43,9 @@ class TimestampElement(Element):
   name = "timestamp"
   names = {"timestamp", "Timestamp", "time stamp", "Time Stamp"}
 
-  def __init__(self, value: int):
-    self.value = int(value)
+  # Python returns a float value in seconds for timestamp so conform to that 
+  def __init__(self, value: float):
+    self.value = float(value)
 
 class DatetimeElement(Element):
   name = "datetime"

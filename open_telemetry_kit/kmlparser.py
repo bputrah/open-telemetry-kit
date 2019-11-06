@@ -49,8 +49,7 @@ class KMLParser(Parser):
       if self.require_timestamp and TimestampElement.name not in packet \
           and DatetimeElement.name not in packet:
 
-        self.logger.error("Could not find any time elements when require_timestamp was set")
-        raise Exception("No timestamp or datetime found with 'require_timestamp' set to true.")
+        self.logger.critical("Could not find any time elements when require_timestamp was set")
 
       if len(packet) > 0:
         self.logger.info("Adding new packet.")
@@ -78,8 +77,7 @@ class KMLParser(Parser):
         if self.require_timestamp and TimestampElement.name not in packet \
             and DatetimeElement.name not in packet:
 
-          self.logger.error("Could not find any time elements when require_timestamp was set")
-          raise Exception("No timestamp or datetime found with 'require_timestamp' set to true.")
+          self.logger.critical("Could not find any time elements when require_timestamp was set")
 
         if len(packet) > 0:
           self.logger.info("Adding new packet.")

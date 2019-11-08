@@ -57,33 +57,39 @@ class TimestampElement(Element):
 
   def to_seconds(self):
     if self.units == self._unit_code[0]:
-      return
+      return self
     elif self.units == self._unit_code[1]:
       self.value = self.value * 1e-3
       self.units = self._unit_code[0]
+      return self
     elif self.units == self._unit_code[2]:
       self.value = self.value * 1e-6
       self.units = self._unit_code[0]
+      return self
 
   def to_milliseconds(self):
     if self.units == self._unit_code[0]:
       self.value = self.value * 1e3
       self.units = self._unit_code[1]
+      return self
     elif self.units == self._unit_code[1]:
-      return
+      return self
     elif self.units == self._unit_code[2]:
       self.value = self.value * 1e-3
       self.units = self._unit_code[1]
+      return self
 
   def to_microseconds(self):
     if self.units == self._unit_code[0]:
       self.value = int(self.value * 1e6)
       self.units = self._unit_code[2]
+      return self
     elif self.units == self._unit_code[1]:
       self.value = int(self.value * 1e3)
       self.units = self._unit_code[2]
+      return self
     elif self.units == self._unit_code[2]:
-      return
+      return self
 
 class DatetimeElement(Element):
   name = "datetime"

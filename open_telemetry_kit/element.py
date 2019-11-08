@@ -43,9 +43,44 @@ class TimestampElement(Element):
   name = "timestamp"
   names = {"timestamp", "Timestamp", "time stamp", "Time Stamp"}
 
+  _state_code = {0 : "seconds",
+                1 : "milliseconds",
+                2 : "microseconds"}
+
   # Python returns a float value in seconds for timestamp so conform to that 
   def __init__(self, value: float):
     self.value = float(value)
+    self.state = self._state_code[0]
+
+  def to_seconds(self):
+    if self.state == self._state_code[0]:
+      return
+    elif self.state == self._state_code[1]:
+      self.value = self.value * 1e-3
+      self.state = self._state_code[0]
+    elif self.state == self._state_code[2]:
+      self.value = self.value * 1e-6
+      self.state = self._state_code[0]
+
+  def to_milliseconds(self):
+    if self.state == self._state_code[0]:
+      self.value = self.value * 1e3
+      self.state = self._state_code[1]
+    elif self.state == self._state_code[1]:
+      return
+    elif self.state == self._state_code[2]:
+      self.value = self.value * 1e-3
+      self.state = self._state_code[1]
+
+  def to_microseconds(self):
+    if self.state == self._state_code[0]:
+      self.value = self.value * 1e6
+      self.state = self._state_code[2]
+    elif self.state == self._state_code[1]:
+      self.value = self.value * 1e3
+      self.state = self._state_code[2]
+    elif self.state == self._state_code[2]:
+      return
 
 class DatetimeElement(Element):
   name = "datetime"

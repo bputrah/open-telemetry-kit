@@ -73,3 +73,6 @@ def read_embedded_subtitles(src: str) -> str:
   cmd = "ffmpeg -y -i " + src + " -f srt - " 
   srt = os.popen(cmd).read()
   return srt
+
+def read_klv(src: str):
+  # cmd = "ffmpeg -i " + src + " -map 0:"  

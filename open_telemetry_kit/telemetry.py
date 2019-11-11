@@ -7,6 +7,7 @@ from collections import UserList
 from typing import List
 from .packet import Packet
 from datetime import timedelta
+from dateutil import parser as dup
 
 class Telemetry(UserList):
   def __init__(self, packets: List[Packet] = []):
@@ -36,12 +37,12 @@ class Telemetry(UserList):
         video_duration = None
         if "tags" in video_metadata["streams"][0]     \
            and "creation_time" in video_metadata["streams"][0]["tags"]:
-          video_creation = video_metadata["streams"][0]["tags"]["creation_time"]
+          video_creation = dup.parse(video_metadata["streams"][0]["tags"]["creation_time"])
         else:
           return None
 
         if "duration" in video_metadata["streams"][0]:
-          video_duration = video_metadata["streams"][0]["duration"]
+          video_duration = float(video_metadata["streams"][0]["duration"])
         else:
           return None
 
@@ -51,29 +52,29 @@ class Telemetry(UserList):
       else:
         return None
 
-      time_and_dur.sort(key=lambda vid: vid[0])
+    time_and_dur.sort(key=lambda vid: vid[0])
 
-      split = []
-      start_idx = 0
-      end_idx = 0
-      for vid in time_and_dur:
-        if has_timestamp:
-          start_idx = next(idx for idx, packet in enumerate(self.data[start_idx:])
-                                 if packet['timestamp'].to_seconds().value >= vid[0])
+    split = []
+    start_idx = 0
+    end_idx = 0
+    for vid in time_and_dur:
+      if has_timestamp:
+        start_idx = next(idx for idx, packet in enumerate(self.data[start_idx:])
+                                if packet['timestamp'].to_seconds().value >= vid[0])
 
-          end_idx = next(idx for idx, packet in enumerate(self.data[start_idx:]) 
-                               if packet['timestamp'].to_seconds().value > vid[0] + vid[1])
+        end_idx = next(idx for idx, packet in enumerate(self.data[start_idx:]) 
+                              if packet['timestamp'].to_seconds().value > vid[0] + vid[1])
 
-        elif has_datetime:
-          td = timedelta(seconds=vid[1])
-          start_idx = next(idx for idx, packet in enumerate(self.data[start_idx:])
-                                 if packet['datetime'].value >= vid[0])
+      elif has_datetime:
+        td = timedelta(seconds=vid[1])
+        start_idx = next(idx for idx, packet in enumerate(self.data[start_idx:])
+                                if packet['datetime'].value >= vid[0])
 
-          end_idx = next(idx for idx, packet in enumerate(self.data[start_idx:]) 
-                               if packet['datetime'].value > vid[0] + td)
+        end_idx = next(idx for idx, packet in enumerate(self.data[start_idx:]) 
+                              if packet['datetime'].value > vid[0] + td)
 
-        if (start_idx < end_idx):
-          split.append(Telemetry(self.data[start_idx:end_idx]))
-          start_idx = end_idx
-      
-      return split
+      if (start_idx < end_idx):
+        split.append(Telemetry(self.data[start_idx:end_idx]))
+        start_idx = end_idx
+    
+    return split

@@ -2,7 +2,7 @@ from .element import Element
 from .misb_0601 import MISB_0601
 from datetime import datetime
 from dateutil import parser as dup
-import open_telemetry_kit.klv_common
+from .klv_common import bytes_to_int, bytes_to_float, bytes_to_str
 
 class ChecksumElement(Element, MISB_0601):
   name = "checksum"
@@ -18,8 +18,7 @@ class ChecksumElement(Element, MISB_0601):
 
   @classmethod
   def fromMISB(cls, value: str):
-    pass
-    # self.value = bytes_to_hex(value)
+    return cls(bytes_to_int(value))
   
 class TimestampElement(Element, MISB_0601):
   name = "timestamp"
@@ -36,8 +35,9 @@ class TimestampElement(Element, MISB_0601):
 
   @classmethod
   def fromMISB(cls, value: str):
-    pass
-    # self.value = bytes_to_int(value)
+    # Convert to seconds then back to microseconds for now.
+    # There's definitely a better way to handle this
+    return cls(bytes_to_int(value) * 1e-6).value * 1e6
 
 class DatetimeElement(Element):
   name = "datetime"
@@ -64,8 +64,7 @@ class MissionIDElement(Element, MISB_0601):
 
   @classmethod
   def fromMISB(cls, value: str):
-    pass
-    # self.value = bytes_to_str(value)
+    return cls(bytes_to_str(value))
 
 class PlatformHeadingAngleElement(Element, MISB_0601):
   name = "platformHeadingAngle"
@@ -86,9 +85,7 @@ class PlatformHeadingAngleElement(Element, MISB_0601):
     pass
     # 0 to 360
     # 0 to (2^16)-1
-    # python built in int().from_bytes
-    # then map to range
-    # self.value = bytes_to_int(value) * (360/65535)
+    return cls(bytes_to_float(value, 0, 2**16 - 1, 0, 360))
 
 class PlatformPitchAngleElement(Element, MISB_0601):
   name = "platformPitchAngleShort"
@@ -110,9 +107,10 @@ class PlatformPitchAngleElement(Element, MISB_0601):
     # 0x8000= "Out of Range"
     # -20 to 20
     # -((2^15)-1) to (2^15)-1
-    # python built in int().from_bytes
-    # then map to range
-    # self.value = bytes_to_int(value) * (40/65535)
+    if value == bytes.fromhex('8000'):
+      return cls(None)
+    else:
+      return cls(bytes_to_float(value, -(2**15 - 1), 2**15 - 1, -20, 20))
 
 class PlatformPitchAngleFullElement(Element, MISB_0601):
   name = "platformPitchAngleFull"
@@ -130,12 +128,13 @@ class PlatformPitchAngleFullElement(Element, MISB_0601):
 
   @classmethod
   def fromMISB(cls, value: str):
-    pass
     # 0x80000000 = "Out of Range"
     # -90 to 90
     # -((2^31)-1) to (2^31)-1
-    # int().from_bytes
-    # lerp
+    if value == bytes.fromhex('80000000'):
+      return cls(None)
+    else:
+      return cls(bytes_to_float(value, -(2**31 - 1), 2**31 - 1, -90, 90))
 
 class PlatformRollAngleElement(Element, MISB_0601):
   name = "platformRollAngleShort"
@@ -153,12 +152,13 @@ class PlatformRollAngleElement(Element, MISB_0601):
 
   @classmethod
   def fromMISB(cls, value: str):
-    pass
     # 0x8000= "Out of Range"
     # -50 to 50
     # -((2^15)-1) to (2^15)-1
-    # int().from_bytes
-    # lerp
+    if value == bytes.fromhex('8000'):
+      return cls(None)
+    else:
+      return cls(bytes_to_float(value, -(2**15 - 1), 2**15 - 1, -50, 50))
 
 class PlatformRollAngleFullElement(Element, MISB_0601):
   name = "platformRollAngleFull"
@@ -176,12 +176,13 @@ class PlatformRollAngleFullElement(Element, MISB_0601):
 
   @classmethod
   def fromMISB(cls, value: str):
-    pass
     # 0x80000000 = "Out of Range"
     # -90 to 90
     # -((2^31)-1) to (2^31)-1
-    # int().from_bytes
-    # lerp
+    if value == bytes.fromhex('80000000'):
+      return cls(None)
+    else:
+      return cls(bytes_to_float(value, -(2**31 - 1), 2**31 - 1, -90, 90))
 
 class PlatformDesignationElement(Element, MISB_0601):
   name = "platformDesignation"
@@ -198,8 +199,7 @@ class PlatformDesignationElement(Element, MISB_0601):
 
   @classmethod
   def fromMISB(cls, value: str):
-    pass
-    # bytes_to_str()
+    return cls(bytes_to_str(value))
 
 class ImageSourceSensorElement(Element, MISB_0601):
   name = "imageSourceSensor"
@@ -217,8 +217,7 @@ class ImageSourceSensorElement(Element, MISB_0601):
 
   @classmethod
   def fromMISB(cls, value: str):
-    pass
-    # bytes_to_str()
+    return cls(bytes_to_str(value))
 
 class ImageCoordinateSystemElement(Element, MISB_0601):
   name = "imageCoordinateSystem"
@@ -236,8 +235,7 @@ class ImageCoordinateSystemElement(Element, MISB_0601):
 
   @classmethod
   def fromMISB(cls, value: str):
-    pass
-    # bytes_to_str()
+    return cls(bytes_to_str(value))
 
 class LatitudeElement(Element, MISB_0601):
   name = "latitude"

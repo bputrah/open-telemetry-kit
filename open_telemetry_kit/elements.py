@@ -2,7 +2,7 @@ from .element import Element
 from .misb_0601 import MISB_0601
 from datetime import datetime
 from dateutil import parser as dup
-import klv_common
+import open_telemetry_kit.klv_common
 
 class ChecksumElement(Element, MISB_0601):
   name = "checksum"

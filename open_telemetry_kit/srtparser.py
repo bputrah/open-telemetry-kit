@@ -2,8 +2,8 @@ from .parser import Parser
 from .telemetry import Telemetry
 from .packet import Packet
 from .element import Element, UnknownElement
-from .element import TimestampElement, TimeframeBeginElement, TimeframeEndElement, DatetimeElement
-from .element import LatitudeElement, LongitudeElement, AltitudeElement
+from .elements import TimestampElement, TimeframeBeginElement, TimeframeEndElement, DatetimeElement
+from .elements import LatitudeElement, LongitudeElement, AltitudeElement
 import open_telemetry_kit.detector as detector
 
 from datetime import timedelta

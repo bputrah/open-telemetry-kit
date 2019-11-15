@@ -12,7 +12,7 @@ class Element():
 
   def __str__(self):
     # return '{}'.format(self.value)
-    return self.value
+    return str(self.value)
 
   def __repr__(self) -> str:
     return "{}('{}')".format(self.__class__.__name__, self.value)

@@ -12,7 +12,7 @@ class Element():
 
   def __str__(self):
     # return '{}'.format(self.value)
-    return self.value
+    return str(self.value)
 
   def __repr__(self) -> str:
     return "{}('{}')".format(self.__class__.__name__, self.value)
@@ -43,9 +43,53 @@ class TimestampElement(Element):
   name = "timestamp"
   names = {"timestamp", "Timestamp", "time stamp", "Time Stamp"}
 
+  _unit_code = {0 : "seconds",
+                 1 : "milliseconds",
+                 2 : "microseconds"}
+
   # Python returns a float value in seconds for timestamp so conform to that 
   def __init__(self, value: float):
     self.value = float(value)
+    self.units = self._unit_code[0]
+
+  def __repr__(self) -> str:
+    return "{}('{}','{}')".format(self.__class__.__name__, self.value, self.units)
+
+  def to_seconds(self):
+    if self.units == self._unit_code[0]:
+      return self
+    elif self.units == self._unit_code[1]:
+      self.value = self.value * 1e-3
+      self.units = self._unit_code[0]
+      return self
+    elif self.units == self._unit_code[2]:
+      self.value = self.value * 1e-6
+      self.units = self._unit_code[0]
+      return self
+
+  def to_milliseconds(self):
+    if self.units == self._unit_code[0]:
+      self.value = self.value * 1e3
+      self.units = self._unit_code[1]
+      return self
+    elif self.units == self._unit_code[1]:
+      return self
+    elif self.units == self._unit_code[2]:
+      self.value = self.value * 1e-3
+      self.units = self._unit_code[1]
+      return self
+
+  def to_microseconds(self):
+    if self.units == self._unit_code[0]:
+      self.value = int(self.value * 1e6)
+      self.units = self._unit_code[2]
+      return self
+    elif self.units == self._unit_code[1]:
+      self.value = int(self.value * 1e3)
+      self.units = self._unit_code[2]
+      return self
+    elif self.units == self._unit_code[2]:
+      return self
 
 class DatetimeElement(Element):
   name = "datetime"

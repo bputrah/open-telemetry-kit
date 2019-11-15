@@ -16,13 +16,14 @@ class Telemetry(UserList):
   def toJson(self) -> List[Packet]:
     return self.data
 
-  def split_telemetry(self, videos: List[str]) -> List['Telemetry']:
+  def split_telemetry(self, videos: List[str], video_offset: int = 0) -> List['Telemetry']:
     # Split a single telemetry object into multiple objects
     # Use case: Multiple video files but only a single telemetry file
     # Expects list of videos in form of their directory location
     # Get creation time and duration of each video
     # Extract the corresponding subset of the telemetry
     # Assumes telemetry is sorted
+    # Video offset used to offset video timestamps in the event of a clock mismatch
     has_datetime = "datetime" in self.data[0]
     has_timestamp = "timestamp" in self.data[0]
     if not has_datetime and not has_timestamp:
@@ -47,23 +48,28 @@ class Telemetry(UserList):
           return None
 
         if has_timestamp:
-          video_creation = video_creation.timestamp()
-        time_and_dur.append((video_creation, video_duration))
+          video_creation = video_creation.timestamp() + video_offset
+        time_and_dur.append((video_creation, video_duration, video))
       else:
         return None
 
     time_and_dur.sort(key=lambda vid: vid[0])
 
-    split = []
+    split = {}
     start_idx = 0
     end_idx = 0
     for vid in time_and_dur:
+      if vid[0] > self.data[-1]['timestamp'].to_seconds().value or \
+         vid[0] + vid[1] > self.data[-1]['timestamp'].value:
+        # Video not fully contained in telemetry
+        break
       if has_timestamp:
-        start_idx = next(idx for idx, packet in enumerate(self.data[start_idx:])
-                                if packet['timestamp'].to_seconds().value >= vid[0])
+        start_idx += next(idx for idx, packet in enumerate(self.data[start_idx:])
+                          if packet['timestamp'].to_seconds().value >= vid[0])
 
-        end_idx = next(idx for idx, packet in enumerate(self.data[start_idx:]) 
-                              if packet['timestamp'].to_seconds().value > vid[0] + vid[1])
+        end_idx = start_idx + \
+                  next(idx for idx, packet in enumerate(self.data[start_idx:]) 
+                       if packet['timestamp'].to_seconds().value > vid[0] + vid[1])
 
       elif has_datetime:
         td = timedelta(seconds=vid[1])
@@ -74,7 +80,7 @@ class Telemetry(UserList):
                               if packet['datetime'].value > vid[0] + td)
 
       if (start_idx < end_idx):
-        split.append(Telemetry(self.data[start_idx:end_idx]))
+        split[vid[2]] = (Telemetry(self.data[start_idx:end_idx]))
         start_idx = end_idx
     
     return split

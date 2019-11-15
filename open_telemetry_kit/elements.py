@@ -40,7 +40,7 @@ class TimestampElement(Element, MISB_int):
     # There's definitely a better way to handle this
     return cls(bytes_to_int(value) * 1e-6).value * 1e6
 
-    def to_seconds(self):
+  def to_seconds(self):
     if self.state == self._state_code[0]:
       return
     elif self.state == self._state_code[1]:

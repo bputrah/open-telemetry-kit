@@ -47,28 +47,26 @@ class MISB_float(MISB_0601):
   @property
   @classmethod
   @abstractmethod
-  def __domain(cls) -> Tuple[int, int]:
-    pass
-
-
-  @property
-  @classmethod
-  @abstractmethod
-  def __range(cls) -> Tuple[int, int]:
+  def _domain(cls) -> Tuple[int, int]:
     pass
 
   @property
   @classmethod
   @abstractmethod
-  def __invalid(cls) -> bytes:
+  def _range(cls) -> Tuple[int, int]:
+    pass
+
+  @property
+  @classmethod
+  def _invalid(cls) -> bytes:
     pass
 
   @classmethod
   def fromMISB(cls, value):
-    if cls.__invalid and value == cls.__invalid:
+    if isinstance(cls._invalid, bytes) and value == cls._invalid:
       return cls(None)
     else:
-      return cls(bytes_to_float(value, cls.__domain, cls.__range))
+      return cls(bytes_to_float(value, cls._domain, cls._range))
 
 class MISB_str(MISB_0601):
   @classmethod

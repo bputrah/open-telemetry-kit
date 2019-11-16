@@ -64,7 +64,8 @@ class MISB_float(MISB_0601):
   @classmethod
   def fromMISB(cls, value):
     if isinstance(cls._invalid, bytes) and value == cls._invalid:
-      return cls(None)
+      c = cls(0).value = None
+      return c
     else:
       return cls(bytes_to_float(value, cls._domain, cls._range))
 

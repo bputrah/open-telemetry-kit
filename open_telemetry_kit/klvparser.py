@@ -21,8 +21,10 @@ class KLVParser(Parser):
           bytes.fromhex("06 0E 2B 34 01 01 01 01 0F 00 00 00 00 00 00 00") : "old_misb"}
 
   def __init__(self, source: str,
-               is_embedded: bool = True):
+               is_embedded: bool = True,
+               use_misb_name: bool = True):
     self.source = source
+    self.use_misb_name = use_misb_name
     self.element_dict = {}
     self._build_dict(MISB_0601)
     
@@ -86,7 +88,10 @@ class KLVParser(Parser):
       value = self.klv_stream.read(elem_len)
 
       if tag in self.element_dict:
-        packet[self.element_dict[tag].misb_name] = self.element_dict[tag].fromMISB(value)
+        if self.use_misb_name:
+          packet[self.element_dict[tag].misb_name] = self.element_dict[tag].fromMISB(value)
+        else:
+          packet[self.element_dict[tag].name] = self.element_dict[tag].fromMISB(value)
       else: 
         packet["Tag " + str(tag)] = UnknownElement(value)
 

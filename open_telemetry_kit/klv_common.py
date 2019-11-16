@@ -11,6 +11,5 @@ def bytes_to_float(byte, src: Tuple[int, int], dest: Tuple[float, float]):
   i = int.from_bytes(byte, byteorder="big", signed=(src[0] < 0))
   return lerp(i, src[0], src[1], dest[0], dest[1])
 
-#TODO: This function
 def bytes_to_str(byte):
   return byte.decode("utf-8")

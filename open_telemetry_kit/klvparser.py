@@ -25,11 +25,9 @@ class KLVParser(Parser):
                use_misb_name: bool = True):
     self.source = source
     self.use_misb_name = use_misb_name
+    self.logger = logging.getLogger("OTK.KLVParser")
     self.element_dict = {}
     self._build_dict(MISB_0601)
-    
-    # for cls in MISB_0601.__subclasses__():
-    #   self.element_dict[cls.misb_tag] = cls
 
   def _build_dict(self, cls):
     for subcls in cls.__subclasses__():
@@ -37,7 +35,6 @@ class KLVParser(Parser):
         self.element_dict[subcls.misb_tag] = subcls
 
       self._build_dict(subcls)
-
 
   def read(self):
     metadata = read_video_metadata(self.source)
@@ -76,13 +73,13 @@ class KLVParser(Parser):
 
       if first_packet and tag != TimestampElement.misb_tag:
         # Per MISB 0601 standard, first tag must be timestamp
-        # TODO: add error
+        self.logger.warn("First element in packet was not Timestamp. Skipping Packet...")
         break
       first_packet = False
 
       elem_len = self._read_len()
       if self.klv_stream.tell() + elem_len > packet_end:
-        #TODO: add error
+        self.logger.warn("Have parsed more bytes than expected. Skipping Packet...")
         break
 
       value = self.klv_stream.read(elem_len)
@@ -93,13 +90,14 @@ class KLVParser(Parser):
         else:
           packet[self.element_dict[tag].name] = self.element_dict[tag].fromMISB(value)
       else: 
+        self.logger.warn("Parsed an unrecognized tag. Creating an UnknownElement")
         packet["Tag " + str(tag)] = UnknownElement(value)
 
     if self.klv_stream.tell() == packet_end:
       tel.append(packet)
       return True
     else:
-      #TODO add error
+      self.logger.warn("Have not parsed the expected number of bytes. Skipping Packet...")
       return False
 
   def _read_len(self):
@@ -124,4 +122,3 @@ class KLVParser(Parser):
     tag = (tag << 7) + (tag_byte)
     return tag
     
-

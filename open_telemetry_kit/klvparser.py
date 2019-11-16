@@ -24,9 +24,18 @@ class KLVParser(Parser):
                is_embedded: bool = True):
     self.source = source
     self.element_dict = {}
+    self._build_dict(MISB_0601)
     
-    for cls in MISB_0601.__subclasses__():
-      self.element_dict[cls.misb_tag] = cls
+    # for cls in MISB_0601.__subclasses__():
+    #   self.element_dict[cls.misb_tag] = cls
+
+  def _build_dict(self, cls):
+    for subcls in cls.__subclasses__():
+      if isinstance(subcls.misb_tag, int):
+        self.element_dict[subcls.misb_tag] = subcls
+
+      self._build_dict(subcls)
+
 
   def read(self):
     metadata = read_video_metadata(self.source)

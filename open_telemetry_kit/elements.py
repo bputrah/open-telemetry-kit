@@ -1007,7 +1007,7 @@ class PlatformVerticalSpeedElement(Element, MISB_float):
   def __init__(self, value: float):
     self.value = float(value)
 
-class PlatformSideslipAngleElement(Element, MISB_0601):
+class PlatformSideslipAngleElement(Element, MISB_float):
   name = "platformSideslipAngle"
   names = {"platformSideslipAngle"}
 
@@ -1036,7 +1036,7 @@ class AirfieldBarometricPressureElement(Element, MISB_float):
   def __init__(self, value: float):
     self.value = float(value)
 
-class AirfieldElevationElement(Element, MISB_0601):
+class AirfieldElevationElement(Element, MISB_float):
   name = "airfieldElevation"
   names = {"airfieldElevation"}
 
@@ -1044,18 +1044,13 @@ class AirfieldElevationElement(Element, MISB_0601):
   misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 02 03 00 00 00"
   misb_tag = 54
   misb_units = "Meters"
+  _domain = (0, 2**16 - 1)
+  _range = (-900, 19000)
 
   def __init__(self, value: float):
     self.value = float(value)
 
-  @classmethod
-  def fromMISB(cls, value: str):
-    pass
-    # -900 to 19000
-    # 0 to (2^16)-1
-    # bytes_to_float()
-
-class RelativeHumidityElement(Element, MISB_0601):
+class RelativeHumidityElement(Element, MISB_float):
   name = "relativeHumidity"
   names = {"relativeHumidity"}
 
@@ -1063,18 +1058,13 @@ class RelativeHumidityElement(Element, MISB_0601):
   misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 09 00 00 00"
   misb_tag = 55
   misb_units = "Percent"
+  _domain = (0, 2**8 - 1)
+  _range = (0, 100)
 
   def __init__(self, value: float):
     self.value = float(value)
 
-  @classmethod
-  def fromMISB(cls, value: str):
-    pass
-    # 0 to 100
-    # 0 to (2^8)-1
-    # bytes_to_float()
-
-class PlatformGroundSpeedElement(Element, MISB_0601):
+class PlatformGroundSpeedElement(Element, MISB_int):
   name = "platformGroundSpeed"
   names = {"platformGroundSpeed"}
 
@@ -1086,14 +1076,7 @@ class PlatformGroundSpeedElement(Element, MISB_0601):
   def __init__(self, value: int):
     self.value = int(value)
 
-  @classmethod
-  def fromMISB(cls, value: str):
-    pass
-    # 0 to 255
-    # 0 to 255
-    # bytes_to_int()
-
-class GroundRangeElement(Element, MISB_0601):
+class GroundRangeElement(Element, MISB_float):
   name = "groundRange"
   names = {"groundRange"}
 
@@ -1101,18 +1084,13 @@ class GroundRangeElement(Element, MISB_0601):
   misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 06 00 00 00"
   misb_tag = 57
   misb_units = "Meters"
+  _domain = (0, 2**32 - 1)
+  _range = (0, 5000000)
 
   def __init__(self, value: float):
     self.value = float(value)
 
-  @classmethod
-  def fromMISB(cls, value: str):
-    pass
-    # 0 to 5000000
-    # 0 to (2^32)-1
-    # bytes_to_float()
-
-class PlatformFuelRemainingElement(Element, MISB_0601):
+class PlatformFuelRemainingElement(Element, MISB_float):
   name = "platformFuelRemaining"
   names = {"platformFuelRemaining"}
 
@@ -1120,18 +1098,13 @@ class PlatformFuelRemainingElement(Element, MISB_0601):
   misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 07 00 00 00"
   misb_tag = 58
   misb_units = "Kilograms"
+  _domain = (0, 2**16 - 1)
+  _range = (0, 10000)
 
   def __init__(self, value: float):
     self.value = float(value)
 
-  @classmethod
-  def fromMISB(cls, value: str):
-    pass
-    # 0 to 10000
-    # 0 to (2^16)-1
-    # bytes_to_float()
-
-class PlatformCallSignElement(Element, MISB_0601):
+class PlatformCallSignElement(Element, MISB_str):
   name = "platformCallSign"
   names = {"platformCallSign"}
 
@@ -1143,12 +1116,7 @@ class PlatformCallSignElement(Element, MISB_0601):
   def __init__(self, value: str):
     self.value = str(value)
 
-  @classmethod
-  def fromMISB(cls, value: str):
-    pass
-    # bytes_to_str()
-
-class WeaponLoadElement(Element, MISB_0601):
+class WeaponLoadElement(Element, MISB_int):
   name = "weaponLoad"
   names = {"weaponLoad"}
 
@@ -1160,14 +1128,7 @@ class WeaponLoadElement(Element, MISB_0601):
   def __init__(self, value: int):
     self.value = int(value)
 
-  @classmethod
-  def fromMISB(cls, value: str):
-    pass
-    # 0 to (2^16)-1
-    # 0 to (2^16)-1
-    # bytes_to_int()
-
-class WeaponFiredElement(Element, MISB_0601):
+class WeaponFiredElement(Element, MISB_int):
   name = "weaponFired"
   names = {"weaponFired"}
 
@@ -1179,14 +1140,8 @@ class WeaponFiredElement(Element, MISB_0601):
   def __init__(self, value: int):
     self.value = int(value)
 
-  @classmethod
-  def fromMISB(cls, value: str):
-    pass
-    # 0 to 255
-    # 0 to 255
-    # bytes_to_int()
+class LaserPRFCodeElement(Element, MISB_int):
 
-class LaserPRFCodeElement(Element, MISB_0601):
   name = "laserPRFCode"
   names = {"laserPRFCode"}
 
@@ -1198,14 +1153,7 @@ class LaserPRFCodeElement(Element, MISB_0601):
   def __init__(self, value: int):
     self.value = int(value)
 
-  @classmethod
-  def fromMISB(cls, value: str):
-    pass
-    # 0 to (2^16)-1
-    # 0 to (2^16)-1
-    # bytes_to_int()
-
-class SensorFieldofViewNameElement(Element, MISB_0601):
+class SensorFieldofViewNameElement(Element, MISB_int):
   name = "sensorFieldofViewName"
   names = {"sensorFieldofViewName"}
 
@@ -1227,14 +1175,10 @@ class SensorFieldofViewNameElement(Element, MISB_0601):
     self.value = str(value)
 
   @classmethod
-  def fromMISB(cls, value: str):
-    pass
-    # 0 to 7
-    # 0 to 7
-    # bytes_to_int()
-    # _code
+  def fromMISB(cls, value: bytes):
+    return cls(cls._code[bytes_to_int(value)])
 
-class PlatformMagneticHeadingElement(Element, MISB_0601):
+class PlatformMagneticHeadingElement(Element, MISB_float):
   name = "platformMagneticHeading"
   names = {"platformMagneticHeading"}
 
@@ -1242,18 +1186,13 @@ class PlatformMagneticHeadingElement(Element, MISB_0601):
   misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 08 00 00 00"
   misb_tag = 64
   misb_units = "Degrees"
+  _domain = (0, 2**16 - 1)
+  _range = (0, 360)
 
   def __init__(self, value: float):
     self.value = float(value)
 
-  @classmethod
-  def fromMISB(cls, value: str):
-    pass
-    # 0 to 360
-    # 0 to (2^16)-1
-    # bytes_to_float()
-
-class AlternatePlatformLatitudeElement(Element, MISB_0601):
+class AlternatePlatformLatitudeElement(Element, MISB_float):
   name = "alternatePlatformLatitude"
   names = {"alternatePlatformLatitude"}
 
@@ -1261,19 +1200,14 @@ class AlternatePlatformLatitudeElement(Element, MISB_0601):
   misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 14 00 00 00"
   misb_tag = 67
   misb_units = "Degrees"
+  _domain = (-(2**31 - 1), 2**31 - 1)
+  _range = (-90, 90)
+  _invalid = bytes.fromhex('8000 0000')
 
   def __init__(self, value: float):
     self.value = float(value)
 
-  @classmethod
-  def fromMISB(cls, value: str):
-    pass
-    # 0x80000000 = "Reserved"
-    # -90 to 90
-    # -((2^31)-1) to (2^31)-1
-    # bytes_to_float()
-
-class AlternatePlatformLongitudeElement(Element, MISB_0601):
+class AlternatePlatformLongitudeElement(Element, MISB_float):
   name = "alternatePlatformLongitude"
   names = {"alternatePlatformLongitude"}
 
@@ -1281,19 +1215,14 @@ class AlternatePlatformLongitudeElement(Element, MISB_0601):
   misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 15 00 00 00"
   misb_tag = 68
   misb_units = "Degrees"
+  _domain = (-(2**31 - 1), 2**31 - 1)
+  _range = (-180, 180)
+  _invalid = bytes.fromhex('8000 0000')
 
   def __init__(self, value: float):
     self.value = float(value)
 
-  @classmethod
-  def fromMISB(cls, value: str):
-    pass
-    # 0x80000000 = "Reserved"
-    # -180 to 180
-    # -((2^31)-1) to (2^31)-1
-    # bytes_to_float()
-
-class AlternatePlatformAltitudeElement(Element, MISB_0601):
+class AlternatePlatformAltitudeElement(Element, MISB_float):
   name = "alternatePlatformAltitude"
   names = {"alternatePlatformAltitude"}
 
@@ -1301,14 +1230,9 @@ class AlternatePlatformAltitudeElement(Element, MISB_0601):
   misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 16 00 00 00"
   misb_tag = 69
   misb_units = "Degrees"
+  _domain = (0, 2**32 - 1)
+  _range = (-900, 19000)
+  _invalid = bytes.fromhex('8000 0000')
 
   def __init__(self, value: float):
     self.value = float(value)
-
-  @classmethod
-  def fromMISB(cls, value: str):
-    pass
-    # 0x80000000 = "Reserved"
-    # -900 to 19000
-    # 0 to (2^32)-1
-    # bytes_to_float()

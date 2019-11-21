@@ -274,7 +274,7 @@ class AltitudeElement(Element, MISB_float):
 class SensorEllipsoidHeightElement(Element, MISB_float):
   name = "sensorEllipsoidHeight"
   names = {"sensorEllipsoidHeight", "SensorEllipsoidHeight", "sensorellipsoidheight",
-           "Sensor Ellipsoid Height", "sensor ellipsoid heigt"}
+           "Sensor Ellipsoid Height", "sensor ellipsoid height"}
 
   misb_name = "Sensor Ellipsoid Height"
   misb_key = "06 0E 2B 34 01 01 01 01 0E 01 02 01 82 47 00 00"
@@ -946,8 +946,8 @@ class GenericFlagDataElement(Element, MISB_int):
     self.value = int(value)
 
 class SecurityLocalSetElement(Element, MISB_0601):
-  name = "securityLocalSetElement"
-  names = {"securityLocalSetElement"}
+  name = "securityLocalSet"
+  names = {"securityLocalSet"}
 
   misb_name = "Security Local Set"
   misb_key = "06 0E 2B 34 02 03 01 01 0E 01 03 03 02 00 00 00"
@@ -958,7 +958,7 @@ class SecurityLocalSetElement(Element, MISB_0601):
     self.value = str(value)
 
   @classmethod
-  def fromMISB(cls, value: str):
+  def fromMISB(cls, value: bytes):
     # This contains elements from a different standard so this will have
     # to have its own special procedures because it's a fancy boi
     pass
@@ -1236,3 +1236,427 @@ class AlternatePlatformAltitudeElement(Element, MISB_float):
 
   def __init__(self, value: float):
     self.value = float(value)
+
+class AlternatePlatformNameElement(Element, MISB_str):
+  name = "alternatePlatformName"
+  names = {"alternatePlatformName"}
+
+  misb_name = "Alternate Platform Name"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 17 00 00 00"
+  misb_tag = 70
+  misb_units = "None"
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+class AlternatePlatformHeadingElement(Element, MISB_float):
+  name = "alternatePlatformHeading"
+  names = {"alternatePlatformHeading"}
+
+  misb_name = "Alternate Platform Heading"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 18 00 00 00"
+  misb_tag = 71
+  misb_units = "Degrees"
+  _domain = (0, 2**16 - 1)
+  _range = (0, 360)
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+class EventStartTimeUTCElement(Element, MISB_int):
+  name = "eventStartTimeUTC"
+  names = {"evenStartTimeUTC"}
+
+  misb_name = "Event Start Time - UTC"
+  misb_key = "06 0E 2B 34 01 01 01 01 07 02 01 02 07 01 00 00"
+  misb_tag = 72
+  misb_units = "Microseconds"
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+class RVTLocalSetElement(Element, MISB_0601):
+  name = "RVTLocalSet"
+  names = {"RVTLocalSet"}
+
+  misb_name = "RVT Local Set"
+  misb_key = "06 0E 2B 34 02 0B 01 01 0E 01 03 01 02 00 00 00"
+  misb_tag = 73
+  misb_units = "None"
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    # MISB ST 0806
+    # This contains elements from a different standard so this will have
+    # to have its own special procedures because it's a fancy boi
+    pass
+
+class VMTILocalSetElement(Element, MISB_0601):
+  name = "VMTILocalSet"
+  names = {"VMTILocalSet"}
+
+  misb_name = "VMTI Local Set"
+  misb_key = "06 0E 2B 34 02 0B 01 01 0E 01 03 03 06 00 00 00"
+  misb_tag = 74
+  misb_units = "None"
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    # MISB ST 0903
+    # This contains elements from a different standard so this will have
+    # to have its own special procedures because it's a fancy boi
+    pass
+
+class AlternatePlatformEllipsoidHeightElement(Element, MISB_float):
+  name = "alternatePlatformEllipsoidHeight"
+  names = {"alternatePlatformEllipsoidHeight", "AlternatePlatformEllipsoidHeight", "alternateplatformellipsoidheight",
+           "Alternate Platform Ellipsoid Height", "alternate platform ellipsoid height"}
+
+  misb_name = "Allternate Platform Ellipsoid Height"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 02 01 82 48 00 00"
+  misb_tag = 76
+  misb_units = "Meters"
+  _domain = (0, 2**16 - 1)
+  _range = (-900, 19000)
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class OperationalModeElement(Element, MISB_int):
+  name = "operationalMode"
+  names = {"operationalMode"}
+
+  misb_name = "Operational Mode"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 03 21 00 00 00"
+  misb_tag = 77
+  misb_units = "Meters"
+  _code = {0 : "Other",
+           1 : "Operational",
+           2 : "Training",
+           3 : "Exercise",
+           4 : "Maintenance",
+           5 : "Test"}
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    return cls(cls._code[bytes_to_int(value)])
+
+class SensorNorthVelocityElement(Element, MISB_float):
+  name = "sensorNorthVelocity"
+  names = {"sensorNorthVelocity"}
+
+  misb_name = "Sensor North Velocity"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 02 02 7E 00 00 00"
+  misb_tag = 79
+  misb_units = "Meters/Second"
+  _domain = (-(2**15 - 1), 2**15 - 1)
+  _range = (-327, 327)
+  _invalid = bytes.fromhex('8000')
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class SensorEastVelocityElement(Element, MISB_float):
+  name = "sensorEastVelocity"
+  names = {"sensorEastVelocity"}
+
+  misb_name = "Sensor East Velocity"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 02 02 7F 00 00 00"
+  misb_tag = 80
+  misb_units = "Meters/Second"
+  _domain = (-(2**15 - 1), 2**15 - 1)
+  _range = (-327, 327)
+  _invalid = bytes.fromhex('8000')
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class ImageHorizonPixelPackElement(Element, MISB_0601):
+  name = "imageHorizonPixelPack"
+  names = {"imageHorizonPixelPack"}
+
+  misb_name = "image Horizon Pixel Pack"
+  misb_key = "06 0E 2B 34 02 05 01 01 0E 01 03 02 08 00 00 00"
+  misb_tag = 81 
+  misb_units = "None"
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+  @classmethod
+  def fromMISB(cls, value: str):
+    # Looks like the initialization for this is system dependent
+    # Something fancy will need to be done if this ever gets implemented
+    pass
+
+class CornerLatitudePoint1Element(Element, MISB_float):
+  name = "cornerLatitudePoint1"
+  names = {"cornerLatitudePoint1"}
+
+  misb_name = "Corner Latitude Point 1 (Full)"
+  misb_key = "06 0E 2B 34 01 01 01 03 07 01 02 01 03 07 01 00"
+  misb_tag = 82
+  misb_units = "Degrees"
+  _domain = (-(2**31 - 1), 2**31 - 1)
+  _range = (-90, 90)
+  _invalid = bytes.fromhex('8000 0000')
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class CornerLongitudePoint1Element(Element, MISB_float):
+  name = "cornerLongitudePoint1"
+  names = {"cornerLongitudePoint1"}
+
+  misb_name = "Corner Longitude Point 1 (Full)"
+  misb_key = "06 0E 2B 34 01 01 01 03 07 01 02 01 03 0B 01 00"
+  misb_tag = 83
+  misb_units = "Degrees"
+  _domain = (-(2**31 - 1), 2**31 - 1)
+  _range = (-180, 180)
+  _invalid = bytes.fromhex('8000 0000')
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class CornerLatitudePoint2Element(Element, MISB_float):
+  name = "cornerLatitudePoint2"
+  names = {"cornerLatitudePoint2"}
+
+  misb_name = "Corner Latitude Point 2 (Full)"
+  misb_key = "06 0E 2B 34 01 01 01 03 07 01 02 01 03 08 01 00"
+  misb_tag = 84
+  misb_units = "Degrees"
+  _domain = (-(2**31 - 1), 2**31 - 1)
+  _range = (-90, 90)
+  _invalid = bytes.fromhex('8000 0000')
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class CornerLongitudePoint2Element(Element, MISB_float):
+  name = "cornerLongitudePoint2"
+  names = {"cornerLongitudePoint2"}
+
+  misb_name = "Corner Longitude Point 2 (Full)"
+  misb_key = "06 0E 2B 34 01 01 01 03 07 01 02 01 03 0C 01 00"
+  misb_tag = 85
+  misb_units = "Degrees"
+  _domain = (-(2**31 - 1), 2**31 - 1)
+  _range = (-180, 180)
+  _invalid = bytes.fromhex('8000 0000')
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class CornerLatitudePoint3Element(Element, MISB_float):
+  name = "cornerLatitudePoint3"
+  names = {"cornerLatitudePoint3"}
+
+  misb_name = "Corner Latitude Point 3 (Full)"
+  misb_key = "06 0E 2B 34 01 01 01 03 07 01 02 01 03 09 01 00"
+  misb_tag = 86
+  misb_units = "Degrees"
+  _domain = (-(2**31 - 1), 2**31 - 1)
+  _range = (-90, 90)
+  _invalid = bytes.fromhex('8000 0000')
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class CornerLongitudePoint3Element(Element, MISB_float):
+  name = "cornerLongitudePoint3"
+  names = {"cornerLongitudePoint3"}
+
+  misb_name = "Corner Longitude Point 3 (Full)"
+  misb_key = "06 0E 2B 34 01 01 01 03 07 01 02 01 03 0D 01 00"
+  misb_tag = 87
+  misb_units = "Degrees"
+  _domain = (-(2**31 - 1), 2**31 - 1)
+  _range = (-180, 180)
+  _invalid = bytes.fromhex('8000 0000')
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class CornerLatitudePoint4Element(Element, MISB_float):
+  name = "cornerLatitudePoint4"
+  names = {"cornerLatitudePoint4"}
+
+  misb_name = "Corner Latitude Point 4 (Full)"
+  misb_key = "06 0E 2B 34 01 01 01 03 07 01 02 01 03 0A 01 00"
+  misb_tag = 88
+  misb_units = "Degrees"
+  _domain = (-(2**31 - 1), 2**31 - 1)
+  _range = (-90, 90)
+  _invalid = bytes.fromhex('8000 0000')
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class CornerLongitudePoint4Element(Element, MISB_float):
+  name = "cornerLongitudePoint4"
+  names = {"cornerLongitudePoint4"}
+
+  misb_name = "Corner Longitude Point 4 (Full)"
+  misb_key = "06 0E 2B 34 01 01 01 03 07 01 02 01 03 0E 01 00"
+  misb_tag = 89
+  misb_units = "Degrees"
+  _domain = (-(2**31 - 1), 2**31 - 1)
+  _range = (-180, 180)
+  _invalid = bytes.fromhex('8000 0000')
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class PlatformAngleofAttackFullElement(Element, MISB_float):
+  name = "PlatformAngleofAttackFull"
+  names = {"PlatformAngleofAttackFull"}
+
+  misb_name = "Platform Angle of Attack (Full)"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 02 00 00 00"
+  misb_tag = 92
+  misb_units = "Degrees"
+  _range = (-90, 90)
+  _domain = (-(2**31 - 1), 2**31 - 1)
+  _invalid = bytes.fromhex('8000 0000')
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class PlatformSideslipAngleFullElement(Element, MISB_float):
+  name = "PlatformSideslipAngleFull"
+  names = {"PlatformSideslipAngleFull"}
+
+  misb_name = "Platform Sideslip Angle (Full)"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 04 00 00 00"
+  misb_tag = 93
+  misb_units = "Degrees"
+  _range = (-180, 180)
+  _domain = (-(2**31 - 1), 2**31 - 1)
+  _invalid = bytes.fromhex('8000 0000')
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class MIISCoreIdentifierElement(Element, MISB_0601):
+  name = "MIISCoreIdentifier"
+  names = {"MIISCoreIdentifier"}
+
+  misb_name = "MIIS Core Identifier"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 04 05 03 00 00 00"
+  misb_tag = 94
+  misb_units = "None"
+
+  def __init__(self, value: bytes):
+    self.value = bytes(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    # MISB ST 1204
+    # TODO: Not technically correct
+    return cls(value)
+
+class SARMotionImageryLocalSetElement(Element, MISB_0601):
+  name = "SARMotionImageryLocalSet"
+  names = {"SARMotionImageryLocalSet"}
+
+  misb_name = "SAR Motion Imagery Local Set"
+  misb_key = "06 0E 2B 34 02 0B 01 01 0E 01 03 03 0D 00 00 00"
+  misb_tag = 95
+  misb_units = "None"
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    # MISB 1206
+    # This contains elements from a different standard so this will have
+    # to have its own special procedures because it's a fancy boi
+    pass
+
+class RangeImageLocalSetElement(Element, MISB_0601):
+  name = "rangeImageLocalSet"
+  names = {"rangeImageLocalSet"}
+
+  misb_name = "Range Image Local Set"
+  misb_key = "06 0E 2B 34 02 0B 01 01 0E 01 03 03 0C 00 00 00"
+  misb_tag = 97
+  misb_units = "None"
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    # MISB 1002
+    # This contains elements from a different standard so this will have
+    # to have its own special procedures because it's a fancy boi
+    pass
+
+class GeoRegistrationLocalSetElement(Element, MISB_0601):
+  name = "geoRegistrationLocalSet"
+  names = {"geoRegistrationLocalSet"}
+
+  misb_name = "Geo-Registration Local Set"
+  misb_key = "06 0E 2B 34 02 0B 01 01 0E 01 03 03 01 00 00 00"
+  misb_tag = 98
+  misb_units = "None"
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    # MISB 1601
+    # This contains elements from a different standard so this will have
+    # to have its own special procedures because it's a fancy boi
+    pass
+
+class CompositeImagingLocalSetElement(Element, MISB_0601):
+  name = "compositeImagingLocalSet"
+  names = {"compositeImagingLocalSet"}
+
+  misb_name = "Composite Imaging Local Set"
+  misb_key = "06 0E 2B 34 02 0B 01 01 0E 01 03 03 02 00 00 00"
+  misb_tag = 99
+  misb_units = "None"
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    # MISB 1602
+    # This contains elements from a different standard so this will have
+    # to have its own special procedures because it's a fancy boi
+    pass
+
+class SegmentLocalSetElement(Element, MISB_0601):
+  name = "segmentLocalSet"
+  names = {"segmentLocalSet"}
+
+  misb_name = "Segment Local Set"
+  misb_key = "06 0E 2B 34 02 0B 01 01 0E 01 03 03 03 00 00 00"
+  misb_tag = 100
+  misb_units = "None"
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    # MISB 1607
+    # This contains elements from a different standard so this will have
+    # to have its own special procedures because it's a fancy boi
+    pass

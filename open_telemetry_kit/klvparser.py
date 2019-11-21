@@ -18,7 +18,8 @@ from typing import List
 class KLVParser(Parser):
   tel_type = 'klv'
   keys = {bytes.fromhex("06 0E 2B 34 02 0B 01 01 0E 01 03 01 01 00 00 00") : "misb" ,
-          bytes.fromhex("06 0E 2B 34 01 01 01 01 0F 00 00 00 00 00 00 00") : "old_misb"}
+          bytes.fromhex("06 0E 2B 34 01 01 01 01 0F 00 00 00 00 00 00 00") : "old_misb",
+          bytes.fromhex("06 0E 2B 34 02 05 01 01 0E 01 01 03 11 00 00 00") : "misb_comm_time"}
 
   def __init__(self, source: str,
                is_embedded: bool = True,
@@ -56,6 +57,10 @@ class KLVParser(Parser):
           packet_end = self.klv_stream.tell() + packet_len
           if not self._parse_misb_packet(tel, packet_end):
             self.klv_stream.seek(packet_start + 1, os.SEEK_SET)
+        elif self.keys[key] in ["misb_comm_time"]:
+          self.logger.warn("Unsupported MISB key found. Skipping packet...")
+          packet_len = self._read_len()
+          self.klv_stream.seek(packet_len, os.SEEK_CUR)
       else:
         self.klv_stream.seek(-15, os.SEEK_CUR)
 

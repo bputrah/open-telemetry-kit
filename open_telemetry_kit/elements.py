@@ -296,13 +296,16 @@ class SensorEllipsoidHeightExtendedElement(Element, MISB_float):
   misb_key = "06 0E 2B 34 01 01 01 01 0E 01 02 01 82 47 00 00"
   misb_tag = 104
   misb_units = "Meters"
-  #TODO
-  # IMAPB ??? based on length?
-  _domain = (0, 2**16 - 1)
+  _domain = "IMAPB"
   _range = (-900, 40000)
 
   def __init__(self, value: float):
     self.value = float(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    l = len(value)
+    return cls(bytes_to_float(value, (0, 2**(8*l)-1), cls._range,))
 
 class SensorHorizontalFOVElement(Element, MISB_float):
   name = "sensorHorizontalFOV"
@@ -427,13 +430,16 @@ class TargetWidthExtendedElement(Element, MISB_float):
   misb_key = "06 0E 2B 34 01 01 01 01 07 01 09 02 01 00 00 00"
   misb_tag = 96
   misb_units = "Meters"
-  # TODO
-  # IMAPB ?????
-  _domain = (0, 2**16 - 1)
+  _domain = "IMAPB"
   _range = (0, 1500000)
 
   def __init__(self, value: float):
     self.value = float(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    l = len(value)
+    return cls(bytes_to_float(value, (0, 2**(8*l)-1), cls._range,))
 
 class FrameCenterLatitudeElement(Element, MISB_float):
   name = "frameCenterLatitude"
@@ -889,7 +895,7 @@ class TargetTrackGateWidthElement(Element, MISB_int):
   def fromMISB(cls, value: str):
     return cls(bytes_to_int(value) * 2)
 
-class TargetTrackGateHeightElement(Element, MISB_float):
+class TargetTrackGateHeightElement(Element, MISB_int):
   name = "targetTrackGateHeight"
   names = {"targetTrackGateHeight"}
 
@@ -1660,3 +1666,195 @@ class SegmentLocalSetElement(Element, MISB_0601):
     # This contains elements from a different standard so this will have
     # to have its own special procedures because it's a fancy boi
     pass
+
+class AmendLocalSetElement(Element, MISB_0601):
+  name = "amendLocalSet"
+  names = {"amendLocalSet"}
+
+  misb_name = "Amend Local Set"
+  misb_key = "06 0E 2B 34 02 0B 01 01 0E 01 03 03 03 01 00 00"
+  misb_tag = 101
+  misb_units = "None"
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    # MISB 1607
+    # This contains elements from a different standard so this will have
+    # to have its own special procedures because it's a fancy boi
+    pass
+
+class SDCCFLPElement(Element, MISB_0601):
+  name = "SDCCFLP"
+  names = {"SDCCFLP"}
+
+  misb_name = "SDCC-FLP"
+  misb_key = "06 0E 2B 34 02 05 01 01 0E 01 03 03 21 00 00 00"
+  misb_tag = 102
+  misb_units = "None"
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    # MISB 1010
+    # This element is definied in the standard above
+    pass
+
+class DensityAltitudeExtendedElement(Element, MISB_float):
+  name = "densityAltitudeExtended"
+  names = {"densityAltitudeExtended"}
+
+  misb_name = "Density Altitude Extended"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 10 00 00 00"
+  misb_tag = 103
+  misb_units = "Meters"
+  _domain = "IMAPB"
+  _range = (-900, 40000)
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    l = len(value)
+    return cls(bytes_to_float(value, (0, 2**(8*l)-1), cls._range,))
+
+class AltPlatformEllipsoidHeightExtendedElement(Element, MISB_float):
+  name = "alternatePlatformEllipsoidHeightExtended"
+  names = {"alternatePlatformEllipsoidHeightExtended"}
+
+  misb_name = "Alternate Platform Ellipsoid Height Extended"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 02 01 82 48 00 00"
+  misb_tag = 105
+  misb_units = "Meters"
+  _domain = "IMAPB"
+  _range = (-900, 40000)
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    l = len(value)
+    return cls(bytes_to_float(value, (0, 2**(8*l)-1), cls._range))
+
+class StreamDesignatorElement(Element, MISB_str):
+  name = "streamDesignator"
+  names = {"streamDesignator"}
+
+  misb_name = "Stream Designator"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 04 03 03 00 00 00"
+  misb_tag = 106
+  misb_units = "None"
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+class OperationalBaseElement(Element, MISB_str):
+  name = "operationalBase"
+  names = {"operationalBase"}
+
+  misb_name = "Operational Base"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 04 03 03 00 00 00"
+  misb_tag = 107
+  misb_units = "None"
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+class BroadcastSourceElement(Element, MISB_str):
+  name = "broadcastSource"
+  names = {"broadcastSource"}
+
+  misb_name = "Broadcast Source"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 04 03 03 00 00 00"
+  misb_tag = 108
+  misb_units = "None"
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+class RangeToRecoveryElement(Element, MISB_float):
+  name = "rangeToRecovery"
+  names = {"rangeToRecovery"}
+
+  misb_name = "Range To Recovery"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 30 00 00 00"
+  misb_tag = 109
+  misb_units = "Kilometers"
+  _domain = "IMAPB"
+  _range = (0, 21000)
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    l = len(value)
+    return cls(bytes_to_float(value, (0, 2**(8*l)-1), cls._range))
+
+class TimeAirborneElement(Element, MISB_int):
+  name = "timeAirborne"
+  names = {"timeAirborne"}
+
+  misb_name = "Time Airborne"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 31 00 00 00"
+  misb_tag = 110
+  misb_units = "Seconds"
+
+  def __init__(self, value: int):
+    self.value = int(value)
+
+class PropulsionUnitSpeedElement(Element, MISB_int):
+  name = "propulsionUnitSpeed"
+  names = {"propulsionUnitSpeed"}
+
+  misb_name = "Propulsion Unit Speed"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 32 00 00 00"
+  misb_tag = 111
+  misb_units = "Revolutions Per Minute"
+
+  def __init__(self, value: int):
+    self.value = int(value)
+
+class PlatformCourseAngleElement(Element, MISB_float):
+  name = "platformCourseAngle"
+  names = {"platformCourseAngle"}
+
+  misb_name = "Platform Course Angle"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 33 00 00 00"
+  misb_tag = 112
+  misb_units = "Degrees"
+  _domain = "IMAPB"
+  _range = (0, 360)
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    l = len(value)
+    return cls(bytes_to_float(value, (0, 2**(8*l)-1), cls._range))
+
+class AltitudeAGLElement(Element, MISB_float):
+  name = "altitudeAGL"
+  names = {"altitudeAGL"}
+
+  misb_name = "Altitude AGL"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 34 00 00 00"
+  misb_tag = 113
+  misb_units = "Meters"
+  _domain = "IMAPB"
+  _range = (-900, 40000)
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    l = len(value)
+    return cls(bytes_to_float(value, (0, 2**(8*l)-1), cls._range))

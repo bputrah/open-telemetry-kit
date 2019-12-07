@@ -1563,14 +1563,15 @@ class MIISCoreIdentifierElement(Element, MISB_0601):
   misb_tag = 94
   misb_units = "None"
 
-  def __init__(self, value: bytes):
-    self.value = bytes(value)
+  def __init__(self, value: str):
+    self.value = str(value)
 
   @classmethod
   def fromMISB(cls, value: bytes):
     # MISB ST 1204
-    # TODO: Not technically correct
-    return cls(value)
+    # This contains elements from a different standard so this will have
+    # to have its own special procedures because it's a fancy boi
+    pass
 
 class SARMotionImageryLocalSetElement(Element, MISB_0601):
   name = "SARMotionImageryLocalSet"

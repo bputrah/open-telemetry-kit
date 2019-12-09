@@ -1,8 +1,9 @@
 from .element import Element
 from .misb_0601 import MISB_0601, MISB_int, MISB_float, MISB_str 
+from .klv_common import bytes_to_int, bytes_to_float, bytes_to_str, read_len, read_ber_oid
 from datetime import datetime
 from dateutil import parser as dup
-from .klv_common import bytes_to_int, bytes_to_float, bytes_to_str
+from io import BytesIO
 
 class ChecksumElement(Element, MISB_int):
   name = "checksum"
@@ -302,11 +303,6 @@ class SensorEllipsoidHeightExtendedElement(Element, MISB_float):
   def __init__(self, value: float):
     self.value = float(value)
 
-  @classmethod
-  def fromMISB(cls, value: bytes):
-    l = len(value)
-    return cls(bytes_to_float(value, (0, 2**(8*l)-1), cls._range,))
-
 class SensorHorizontalFOVElement(Element, MISB_float):
   name = "sensorHorizontalFOV"
   names = {"sensorHorizontalFOV", "SensorHorizontalFOV", "sensorhorizontalfov",
@@ -435,11 +431,6 @@ class TargetWidthExtendedElement(Element, MISB_float):
 
   def __init__(self, value: float):
     self.value = float(value)
-
-  @classmethod
-  def fromMISB(cls, value: bytes):
-    l = len(value)
-    return cls(bytes_to_float(value, (0, 2**(8*l)-1), cls._range,))
 
 class FrameCenterLatitudeElement(Element, MISB_float):
   name = "frameCenterLatitude"
@@ -743,7 +734,7 @@ class OffsetCornerLongitudePoint4Element(Element, MISB_float):
   def __init__(self, value: float):
     self.value = float(value)
 
-class IcingDetectedElement(Element, MISB_int):
+class IcingDetectedElement(Element, MISB_str):
   name = "icingDetected"
   names = {"icingDetected"}
 
@@ -1159,7 +1150,7 @@ class LaserPRFCodeElement(Element, MISB_int):
   def __init__(self, value: int):
     self.value = int(value)
 
-class SensorFieldofViewNameElement(Element, MISB_int):
+class SensorFieldofViewNameElement(Element, MISB_str):
   name = "sensorFieldofViewName"
   names = {"sensorFieldofViewName"}
 
@@ -1334,7 +1325,7 @@ class AlternatePlatformEllipsoidHeightElement(Element, MISB_float):
   def __init__(self, value: float):
     self.value = float(value)
 
-class OperationalModeElement(Element, MISB_int):
+class OperationalModeElement(Element, MISB_str):
   name = "operationalMode"
   names = {"operationalMode"}
 
@@ -1719,11 +1710,6 @@ class DensityAltitudeExtendedElement(Element, MISB_float):
   def __init__(self, value: float):
     self.value = float(value)
 
-  @classmethod
-  def fromMISB(cls, value: bytes):
-    l = len(value)
-    return cls(bytes_to_float(value, (0, 2**(8*l)-1), cls._range,))
-
 class AltPlatformEllipsoidHeightExtendedElement(Element, MISB_float):
   name = "alternatePlatformEllipsoidHeightExtended"
   names = {"alternatePlatformEllipsoidHeightExtended"}
@@ -1737,11 +1723,6 @@ class AltPlatformEllipsoidHeightExtendedElement(Element, MISB_float):
 
   def __init__(self, value: float):
     self.value = float(value)
-
-  @classmethod
-  def fromMISB(cls, value: bytes):
-    l = len(value)
-    return cls(bytes_to_float(value, (0, 2**(8*l)-1), cls._range))
 
 class StreamDesignatorElement(Element, MISB_str):
   name = "streamDesignator"
@@ -1793,11 +1774,6 @@ class RangeToRecoveryElement(Element, MISB_float):
   def __init__(self, value: float):
     self.value = float(value)
 
-  @classmethod
-  def fromMISB(cls, value: bytes):
-    l = len(value)
-    return cls(bytes_to_float(value, (0, 2**(8*l)-1), cls._range))
-
 class TimeAirborneElement(Element, MISB_int):
   name = "timeAirborne"
   names = {"timeAirborne"}
@@ -1836,11 +1812,6 @@ class PlatformCourseAngleElement(Element, MISB_float):
   def __init__(self, value: float):
     self.value = float(value)
 
-  @classmethod
-  def fromMISB(cls, value: bytes):
-    l = len(value)
-    return cls(bytes_to_float(value, (0, 2**(8*l)-1), cls._range))
-
 class AltitudeAGLElement(Element, MISB_float):
   name = "altitudeAGL"
   names = {"altitudeAGL"}
@@ -1855,7 +1826,37 @@ class AltitudeAGLElement(Element, MISB_float):
   def __init__(self, value: float):
     self.value = float(value)
 
+class RadarAltimeterElement(Element, MISB_float):
+  name = "radarAltimeter"
+  names = {"radarAltimeter"}
+
+  misb_name = "Radar Altimeter"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 35 00 00 00"
+  misb_tag = 114
+  misb_units = "Meters"
+  _domain = "IMAPB"
+  _range = (-900, 40000)
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class ControlCommandElement(Element, MISB_0601):
+  name = "controlCommand"
+  names = {"controlCommand"}
+
+  misb_name = "Control Command"
+  misb_key = "06 0E 2B 34 02 05 01 01 0E 01 03 01 01 00 00 00"
+  misb_tag = 115
+  misb_units = "None"
+
+  def __init__(self, id: int, string: str, time: int):
+    self.value = (id, string, time)
+
   @classmethod
   def fromMISB(cls, value: bytes):
-    l = len(value)
-    return cls(bytes_to_float(value, (0, 2**(8*l)-1), cls._range))
+    stream = BytesIO(value)
+    cmd_id = read_ber_oid(stream)
+    str_len = read_len(stream)
+    cmd_str = bytes_to_str(stream.read(str_len))
+    cmd_time = bytes_to_int(stream.read(8))
+    return cls(cmd_id, cmd_str, cmd_time)

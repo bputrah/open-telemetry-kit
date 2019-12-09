@@ -1,3 +1,4 @@
+from io import BytesIO
 from typing import Tuple
 
 def bytes_to_int(byte):
@@ -13,3 +14,25 @@ def bytes_to_float(byte, src: Tuple[int, int], dest: Tuple[float, float]):
 
 def bytes_to_str(byte):
   return byte.decode("utf-8")
+
+def read_len(klv_stream: BytesIO):
+  length = bytes_to_int(klv_stream.read(1))
+
+  if length >= 128:
+    length = bytes_to_int(klv_stream.read(length - 128))
+
+  return length
+
+def read_ber_oid(klv_stream: BytesIO):
+  byte = bytes_to_int(klv_stream.read(1))
+
+  if byte < 128:
+    return byte
+
+  val = 0
+  while byte >= 128:
+    val = (val << 7) + (byte - 128)
+    byte = bytes_to_int(klv_stream.read(1))
+
+  val = (val << 7) + (byte)
+  return val

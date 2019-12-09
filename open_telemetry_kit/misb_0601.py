@@ -66,6 +66,9 @@ class MISB_float(MISB_0601):
     if isinstance(cls._invalid, bytes) and value == cls._invalid:
       c = cls(0).value = None
       return c
+    elif cls._domain == 'IMAPB':
+      l = len(value)
+      return cls(bytes_to_float(value, (0, 2**(8*l)-1), cls._range))
     else:
       return cls(bytes_to_float(value, cls._domain, cls._range))
 

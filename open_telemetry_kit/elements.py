@@ -4,6 +4,7 @@ from .klv_common import bytes_to_int, bytes_to_float, bytes_to_str, read_len, re
 from datetime import datetime
 from dateutil import parser as dup
 from io import BytesIO
+from typing import List
 
 class ChecksumElement(Element, MISB_int):
   name = "checksum"
@@ -1860,3 +1861,80 @@ class ControlCommandElement(Element, MISB_0601):
     cmd_str = bytes_to_str(stream.read(str_len))
     cmd_time = bytes_to_int(stream.read(8))
     return cls(cmd_id, cmd_str, cmd_time)
+
+class ControlCommandVerificationListElement(Element, MISB_0601):
+  name = "controlCommandVerificationList"
+  names = {"controlCommandVerificationList"}
+
+  misb_name = "Control Command Verification List"
+  misb_key = "06 0E 2B 34 02 05 01 01 0E 01 03 02 11 00 00 00"
+  misb_tag = 116
+  misb_units = "None"
+
+  def __init__(self, cmd_list: List[int]):
+    self.value = (cmd_list)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    stream = BytesIO(value)
+    end = read_len(stream) + stream.tell()
+    cmd_list = []
+    while stream.tell() != end:
+      cmd_list.append(read_ber_oid(stream))
+    return cls(cmd_list)
+
+class SensorAzimuthRateElement(Element, MISB_float):
+  name = "sensorAzimuthRate"
+  names = {"sensorAzimuthRate"}
+
+  misb_name = "Sensor Azimuth Rate"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 02 0A 09 00 00"
+  misb_tag = 117
+  misb_units = "Degrees Per Second"
+  _domain = "IMAPB"
+  _range = (-1000, 1000)
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class SensorElevationRateElement(Element, MISB_float):
+  name = "sensorElevationRate"
+  names = {"sensorElevationRate"}
+
+  misb_name = "Sensor Elevation Rate"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 02 0A 0A 00 00"
+  misb_tag = 118
+  misb_units = "Degrees Per Second"
+  _domain = "IMAPB"
+  _range = (-1000, 1000)
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class SensorRollRateElement(Element, MISB_float):
+  name = "sensorRollRate"
+  names = {"sensorRollRate"}
+
+  misb_name = "Sensor Roll Rate"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 02 0A 0B 00 00"
+  misb_tag = 119
+  misb_units = "Degrees Per Second"
+  _domain = "IMAPB"
+  _range = (-1000, 1000)
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class OnboardMIStoragePercentFullElement(Element, MISB_float):
+  name = "onboardMIStoragePercentFull"
+  names = {"onboardMIStoragePercentFull"}
+
+  misb_name = "On-board MI Storage Percent Full"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 02 0A 0C 00 00"
+  misb_tag = 120
+  misb_units = "Percentage"
+  _domain = "IMAPB"
+  _range = (0, 100)
+
+  def __init__(self, value: float):
+    self.value = float(value)

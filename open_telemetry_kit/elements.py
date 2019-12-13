@@ -811,9 +811,7 @@ class DensityAltitudeElement(Element, MISB_float):
   def __init__(self, value: float):
     self.value = float(value)
 
-# TODO: This is supposed to be a MISB_int
-# Verify that changing bytes_to_int to check for sign won't break everything
-class OutsideAirTemperatureElement(Element, MISB_float):
+class OutsideAirTemperatureElement(Element, MISB_int):
   name = "outsideAirTemperature"
   names = {"outsideAirTemperature"}
 
@@ -821,8 +819,7 @@ class OutsideAirTemperatureElement(Element, MISB_float):
   misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 11 00 00 00"
   misb_tag = 39
   misb_units = "Celsius"
-  _domain = (-128, 127)
-  _range = (-128, 127)
+  _signed = True
 
   def __init__(self, value: int):
     self.value = int(value)
@@ -1872,7 +1869,7 @@ class ControlCommandVerificationListElement(Element, MISB_0601):
   misb_units = "None"
 
   def __init__(self, cmd_list: List[int]):
-    self.value = (cmd_list)
+    self.value = cmd_list
 
   @classmethod
   def fromMISB(cls, value: bytes):
@@ -1938,3 +1935,482 @@ class OnboardMIStoragePercentFullElement(Element, MISB_float):
 
   def __init__(self, value: float):
     self.value = float(value)
+
+class ActiveWavelengthListElement(Element, MISB_0601):
+  name = "activeWavelengthList"
+  names = {"activeWavelengthList"}
+
+  misb_name = "Active Wavelength List"
+  misb_key = "06 0E 2B 34 02 05 01 01 0E 01 03 02 0A 00 00 00"
+  misb_tag = 121
+  misb_units = "None"
+  _code = { 1 : "VIS",
+            2 : "IR",
+            3 : "NIR",
+            4 : "MIR", 
+            5 : "LIR",
+            6 : "FIR"}
+
+  def __init__(self, value: List[str]):
+    self.value = value
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    stream = BytesIO(value)
+    end = read_len(stream) + stream.tell()
+    cmd_list = []
+    while stream.tell() != end:
+      cmd_list.append(cls._code[read_ber_oid(stream)])
+    return cls(cmd_list)
+
+class CountryCodesElement(Element, MISB_0601):
+  name = "countryCodes"
+  names = {"countryCodes"}
+
+  misb_name = "Country Codes"
+  misb_key = "06 0E 2B 34 02 04 01 01 0E 01 03 03 02 00 00 00"
+  misb_tag = 122
+  misb_units = "None"
+
+  def __init__(self, value: str):
+    self.value = value
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    stream = BytesIO(value)
+    end = read_len(stream) + stream.tell()
+    length = read_len(stream)
+    coding_method = bytes_to_int(stream.read(length))
+    countries = str(coding_method) + " "
+    while stream.tell() != end:
+      length = read_len(stream)
+      if length == 0:
+        countries += "(Unknown Country) "
+      else:
+        countries += bytes_to_str(stream.read(length)) + ' '
+
+    return cls(countries)
+
+class NumNAVSATSinViewElement(Element, MISB_int):
+  name = "numberOfNAVSATsInView"
+  names = {"numberOfNAVSATsInView"}
+
+  misb_name = "Number of NAVSATs in View"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 02 0A 00 00 00"
+  misb_tag = 123
+  misb_units = "Count"
+
+  def __init__(self, value: int):
+    self.value = int(value)
+
+class PositioningMethodSourceElement(Element, MISB_int):
+  name = "positioningMethodSource"
+  names = {"positioningMethodSource"}
+
+  misb_name = "Positioning Method Source"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 02 0A 0E 00 00"
+  misb_tag = 124
+  misb_units = "None"
+  _code = { 0 : "INS",
+            1 : "GPS", 
+            2 : "Galileo",
+            3 : "QZSS",
+            4 : "NAVIC",
+            5 : "GLONASS",
+            6 : "BeiDou-1",
+            7 : "BeiDou-2"}
+
+  def __init__(self, value: int):
+    self.value = []
+    for i in range(8):
+      if value & (1 << i):
+       self.value.append(self._code[i])
+
+class PlatformStatusElement(Element, MISB_int):
+  name = "platformStatus"
+  names = {"platformStatus"}
+
+  misb_name = "Platform Status"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 37 00 00 00"
+  misb_tag = 125
+  misb_units = "None"
+  _code = { 0  : "Active",
+            1  : "Pre-flight", 
+            2  : "Pre-flight-taxiing",
+            3  : "Run-up",
+            4  : "Take-off",
+            5  : "Ingress",
+            6  : "Manual Operation",
+            7  : "Automated-orbit",
+            8  : "Transitioning",
+            9  : "Egress",
+            10 : "Landing",
+            11 : "Landed-taxiing",
+            12 : "Landed-Parked" }
+
+  def __init__(self, value: int):
+    self.value = self._code[value]
+
+class SensorControlModeElement(Element, MISB_int):
+  name = "sensorControlMode"
+  names = {"sensorControlMode"}
+
+  misb_name = "Sensor Control Mode"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 02 0A 0F 00 00"
+  misb_tag = 126
+  misb_units = "None"
+  _code = { 0  : "Off",
+            1  : "Home Position", 
+            2  : "Uncontrolled",
+            3  : "Manual Control",
+            4  : "Calibrating",
+            5  : "Auto - Holding Position",
+            6  : "Auto - Tracking"}
+
+  def __init__(self, value: int):
+    self.value = self._code[value]
+
+class SensorFrameRatePackElement(Element, MISB_0601):
+  name = "sensorFrameRatePack"
+  names = {"sensorFrameRatePack"}
+
+  misb_name = "Sensor Frame Rate Pack"
+  misb_key = "06 0E 2B 34 02 05 01 01 0E 01 03 02 10 00 00 00"
+  misb_tag = 127
+  misb_units = "None"
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    stream = BytesIO(value)
+    end = read_len(stream) + stream.tell()
+    num = read_ber_oid(stream)
+    if stream.tell() != end:
+      den = read_ber_oid(stream)
+    else:
+      den = 1
+    return cls(num/den)
+
+class WavelengthsListElement(Element, MISB_0601):
+  name = "wavelengthsList"
+  names = {"wavelengthsList"}
+
+  misb_name = "Wavelengths List"
+  misb_key = "06 0E 2B 34 02 04 01 01 0E 01 03 02 01 00 00 00"
+  misb_tag = 128
+  misb_units = "None"
+  _code = { 1 : "VIS",
+            2 : "IR",
+            3 : "NIR",
+            4 : "MIR", 
+            5 : "LIR",
+            6 : "FIR"}
+
+  def __init__(self, value: List[str]):
+    self.value = value
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    stream = BytesIO(value)
+    end = read_len(stream) + stream.tell()
+    records = []
+    while stream.tell() != end:
+      record = ""
+      length = read_len(stream)
+      ber_start = stream.tell()
+      record += str(read_ber_oid(stream))
+      ber_len = stream.tell() - ber_start
+      min_val = bytes_to_float(stream.read(4), (0, 2**(8*4)-1), (0, 1e9))
+      max_val = bytes_to_float(stream.read(4), (0, 2**(8*4)-1), (0, 1e9))
+      name = bytes_to_str(stream.read(length - (ber_len + 8)))
+      record += ", " + str(min_val) + ", " + str(max_val) + ", " + name
+      records.append(record)
+
+    return cls(record)
+
+class TargetIDElement(Element, MISB_str):
+  name = "targetID"
+  names = {"targetID"}
+
+  misb_name = "Target ID"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 04 03 03 00 00 00"
+  misb_tag = 129
+  misb_units = "None"
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+class AirbaseLocationsElement(Element, MISB_0601):
+  name = "airbaseLocations"
+  names = {"airbaseLocations"}
+
+  misb_name = "Airbase Locations"
+  misb_key = "06 0E 2B 34 02 04 01 01 0E 01 03 01 01 00 00 00"
+  misb_tag = 130
+  misb_units = "None"
+
+  def __init__(self, value: List[str]):
+    self.value = value
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    stream = BytesIO(value)
+    end = read_len(stream) + stream.tell()
+    locations = []
+    while stream.tell() != end:
+      location = ""
+      length = read_len(stream)
+      if length == 0:
+        location = "Unknown"
+      else:
+        lat = bytes_to_float(stream.read(4), (0, 2**(8*4)-1), (-90, 90))
+        lon = bytes_to_float(stream.read(4), (0, 2**(8*4)-1), (-180, 180))
+        hae = bytes_to_float(stream.read(3), (0, 2**(8*3)-1), (-900, 9000))
+        location = str(lat) + ', ' + str(lon) + ', ' + str(hae)
+
+      locations.append(location)
+
+    if len(locations) < 2:
+      locations.append(locations[0])
+
+    return cls(locations)
+
+class TakeoffTimeElement(Element, MISB_int):
+  name = "takeoffTime"
+  names = {"takeoffTime"}
+
+  misb_name = "Take-off Time"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 01 38 00 00 00"
+  misb_tag = 131
+  misb_units = "Microseconds"
+
+  def __init__(self, value: int):
+    self.value = value
+
+class TransmissionFrequencyElement(Element, MISB_float):
+  name = "transmissionFrequency"
+  names = {"transmissionFrequency"}
+
+  misb_name = "Transmission Frequency"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 02 0A 13 00 00"
+  misb_tag = 132
+  misb_units = "MHz"
+  _domain = "IMAPB"
+  _range = (1, 99999)
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class OnboardMIStorageCapacityElement(Element, MISB_int):
+  name = "onboardMIStorageCapacity"
+  names = {"onboardMIStorageCapacity"}
+
+  misb_name = "On-board MI Storage Capacity"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 02 0A 14 00 00"
+  misb_tag = 133
+  misb_units = "Gigabytes"
+
+  def __init__(self, value: int):
+    self.value = value
+
+class ZoomPercentageElement(Element, MISB_float):
+  name = "zoomPercentage"
+  names = {"zoomPercentage"}
+
+  misb_name = "Zoom Percentage"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 02 0A 15 00 00"
+  misb_tag = 134
+  misb_units = "Percent"
+  _domain = "IMAPB"
+  _range = (0, 100)
+
+  def __init__(self, value: float):
+    self.value = float(value)
+
+class CommunicationsMethodElement(Element, MISB_str):
+  name = "communicationsMethod"
+  names = {"communicationsMethod"}
+
+  misb_name = "Communications Method"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 04 03 03 00 00 00"
+  misb_tag = 135
+  misb_units = "None"
+
+  def __init__(self, value: str):
+    self.value = str(value)
+
+class LeapSecondsElement(Element, MISB_int):
+  name = "leapSeconds"
+  names = {"leapSeconds"}
+
+  misb_name = "Leap Seconds"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 02 0A 00 00 00"
+  misb_tag = 136
+  misb_units = "Seconds"
+  _signed = True
+
+  def __init__(self, value: int):
+    self.value = int(value)
+
+class CorrectionOffsetElement(Element, MISB_int):
+  name = "correctionOffset"
+  names = {"correctionOffset"}
+
+  misb_name = "Correction Offset"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 02 0A 17 00 00"
+  misb_tag = 137
+  misb_units = "Microseconds"
+  _signed = True
+
+  def __init__(self, value: int):
+    self.value = int(value)
+
+class PayloadListElement(Element, MISB_0601):
+  name = "payloadList"
+  names = {"payloadList"}
+
+  misb_name = "Payload List"
+  misb_key = "06 0E 2B 34 02 04 01 01 0E 01 03 02 00 00 00 00"
+  misb_tag = 138
+  misb_units = "None"
+  _code = { 0 : "Electro Optical MI Sensor",
+            1 : "LIDAR",
+            2 : "RADAR",
+            3 : "SIGINT", 
+            4 : "SAR"}
+
+  def __init__(self, value: List[str]):
+    self.value = value
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    stream = BytesIO(value)
+    end = read_len(stream) + stream.tell()
+    payloads = []
+    payloads.append(read_ber_oid(stream))
+    while stream.tell() != end:
+      length = read_len(stream)
+      pid  = str(read_ber_oid(stream))
+      ptype = cls._code[read_ber_oid(stream)]
+      name_len = read_len(stream)
+      name = bytes_to_str(stream.read(name_len))
+      record = pid + ', ' + ptype + ', ' + name
+      payloads.append(record)
+
+    return cls(payloads)
+
+class ActivePayloadsElement(Element, MISB_0601):
+  name = "activePayloads"
+  names = {"activePayloads"}
+
+  misb_name = "Active Payloads"
+  misb_key = "06 0E 2B 34 01 01 01 01 0E 01 01 02 0A 1A 00 00"
+  misb_tag = 139
+  misb_units = "None"
+
+  def __init__(self, value: List[int]):
+    self.value = value
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    val = bytes_to_int(value)
+    active = []
+    for i in range(len(value)):
+      if val & (1 << i):
+       active.append(i)
+    return cls(active)
+
+class WeaponsStoresElement(Element, MISB_0601):
+  name = "weaponsStores"
+  names = {"weaponsStores"}
+
+  misb_name = "Weapons Stores"
+  misb_key = "06 0E 2B 34 02 04 01 01 0E 01 03 01 03 00 00 00"
+  misb_tag = 140
+  misb_units = "None"
+  _code = { 0  : "Off",
+            1  : "Initialization",
+            2  : "Ready/Degraded",
+            3  : "Ready/All Up Round",
+            4  : "Launch",
+            5  : "Free Flight",
+            6  : "Abort",
+            7  : "Miss Fire",
+            8  : "Hang Fire",
+            9  : "Jettisoned",
+            10 : "Stepped Over",
+            11 : "No Status Available"}
+  _code_1 = { 1 : "Fuze Enabled",
+             2 : "Laser Enabled",
+             3 : "Target Enabled",
+             4 : "Weapon Armed"}
+
+  def __init__(self, value: List[int]):
+    self.value = value
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    stream = BytesIO(value)
+    end = read_len(stream) + stream.tell()
+    weapons = []
+    while stream.tell() != end:
+      length = read_len(stream)
+      station = read_ber_oid(stream)
+      hardpoint = read_ber_oid(stream)
+      carriage = read_ber_oid(stream)
+      store = read_ber_oid(stream)
+      state = str(station) + ', ' + str(hardpoint) + ', ' + str(carriage) + ', ' + str(store) + ', '
+      status = read_ber_oid(stream)
+      general = cls._code[ 127 & status ]
+      state += general + ', '
+      if status >> 8:
+        engagement = cls._code_1[status>>8]
+        state += engagement + ', '
+      
+      type_len = read_len(stream)
+      state += stream.read(type_len)
+
+      weapons.append(state)
+
+    return cls(state)
+
+class WaypointListElement(Element, MISB_0601):
+  name = "waypointList"
+  names = {"waypointList"}
+
+  misb_name = "Waypoint List"
+  misb_key = "06 0E 2B 34 02 04 01 01 0E 01 03 01 04 00 00 00"
+  misb_tag = 141
+  misb_units = "None"
+  _code = { 0 : "Automated",
+            1 : "Manual"}
+  _code_1 = { 0 : "Pre-planned",
+              1 : "Ad-hoc"}
+
+  def __init__(self, value: List[int]):
+    self.value = value
+
+  @classmethod
+  def fromMISB(cls, value: bytes):
+    stream = BytesIO(value)
+    end = read_len(stream) + stream.tell()
+    waypoints = []
+    while stream.tell() != end:
+      length = read_len(stream)
+      wp_id = read_ber_oid(stream)
+      order = bytes_to_int(stream.read(2), True)
+      info = read_ber_oid(stream)
+      mode = cls._code[info & 1]
+      source = cls._code[info & 2]
+
+      lat = bytes_to_float(stream.read(4), (0, 2**(8*4)-1), (-90, 90))
+      lon = bytes_to_float(stream.read(4), (0, 2**(8*4)-1), (-180, 180))
+      hae = bytes_to_float(stream.read(3), (0, 2**(8*3)-1), (-900, 9000))
+      location = str(lat) + ', ' + str(lon) + ', ' + str(hae)
+
+      waypoint = str(wp_id) + ', ' + str(order) + ', ' + mode + ', ' + source + ', ' + location
+      waypoints.append(waypoint)
+
+    return cls(waypoints)

@@ -39,9 +39,14 @@ class MISB_0601(metaclass=ABCMeta):
     pass
 
 class MISB_int(MISB_0601):
+  @property
+  @classmethod
+  def _signed(cls) -> bool:
+    False
+
   @classmethod
   def fromMISB(cls, value):
-    return cls(bytes_to_int(value))
+    return cls(bytes_to_int(value, cls._signed))
 
 class MISB_float(MISB_0601):
   @property

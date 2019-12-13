@@ -1,12 +1,12 @@
 from io import BytesIO
 from typing import Tuple
 
-def bytes_to_int(byte):
-  return int.from_bytes(byte, byteorder="big", signed=False)
-
 def lerp(x: int, x0: int, x1: int, y0: float, y1: float):
   t = (x - x0) / (x1 - x0)
   return (1-t) * y0 + t * y1
+
+def bytes_to_int(byte, issigned=False):
+  return int.from_bytes(byte, byteorder="big", signed=issigned)
 
 def bytes_to_float(byte, src: Tuple[int, int], dest: Tuple[float, float]):
   i = int.from_bytes(byte, byteorder="big", signed=(src[0] < 0))

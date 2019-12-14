@@ -2,7 +2,7 @@ from .parser import Parser
 from .telemetry import Telemetry
 from .packet import Packet
 from .element import UnknownElement
-from .element import TimestampElement, DatetimeElement
+from .elements import TimestampElement, DatetimeElement
 
 import csv
 from dateutil import parser as dup

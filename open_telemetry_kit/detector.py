@@ -2,6 +2,7 @@ from .parser import Parser
 import os
 import json
 import logging
+import subprocess
 from typing import Dict, Tuple, Union, List
 JSONType = Dict[str, Union[List[Dict[str, Union[str, int]]], Dict[str,Union[str, int]]]]
 logger = logging.getLogger("OTK.detector")
@@ -73,3 +74,15 @@ def read_embedded_subtitles(src: str) -> str:
   cmd = "ffmpeg -y -i " + src + " -f srt - " 
   srt = os.popen(cmd).read()
   return srt
+
+def read_klv(src: str, metadata: JSONType) -> bytes:
+  klv_idx = None
+  if "streams" in metadata:
+      for idx, stream in enumerate(metadata["streams"]):
+        if stream["codec_type"] == "data" and stream["codec_tag_string"] == "KLVA":
+          klv_idx = str(idx)
+          break
+
+  cmd = ["ffmpeg", "-loglevel", "quiet", "-i" , src , "-map", "0:" + klv_idx, "-codec", "copy", "-f", "data", "-"]
+  klv = subprocess.run(cmd, stdout=subprocess.PIPE).stdout
+  return klv

@@ -2,7 +2,7 @@ from .parser import Parser
 from .telemetry import Telemetry
 from .packet import Packet
 from .element import Element, UnknownElement
-from .element import TimestampElement, DatetimeElement
+from .elements import TimestampElement, DatetimeElement
 
 import xml.etree.ElementTree as ET
 from dateutil import parser as dup

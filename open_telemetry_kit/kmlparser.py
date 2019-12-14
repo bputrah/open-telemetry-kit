@@ -1,8 +1,8 @@
 from .parser import Parser
 from .telemetry import Telemetry
 from .packet import Packet
-from .element import LatitudeElement, LongitudeElement, AltitudeElement
-from .element import TimestampElement, DatetimeElement
+from .elements import LatitudeElement, LongitudeElement, AltitudeElement
+from .elements import TimestampElement, DatetimeElement
 
 import io
 import xml.etree.ElementTree as ET

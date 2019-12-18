@@ -144,6 +144,9 @@ class SRTParser(Parser):
     val1_end = block.find(',', gps_pos)
     val1 = block[gps_pos+3 : val1_end] 
     val2_end = block.find(',', val1_end + 1)
+    # If there are only two values within the parentheses
+    if val2_end == -1:
+      val2_end = gps_end 
     val2 = block[val1_end : val2_end]
     # lat, long
     if 'M' == block[gps_end - 1]:

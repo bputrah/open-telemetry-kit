@@ -170,14 +170,14 @@ class SRTParser(Parser):
   # DJI
   # Looks for telemetry of the form:
   # [iso : 110] [shutter : 1/200.0] [fnum : 280] [ev : 0.7] [ct : 5064] [color_md : default] [focal_len : 240] [latitude: 0.608553] [longtitude: -1.963763] [altitude: 1429.697998] 
-  def _extractData(self, block: str, packet: Dict[str, Element]):
+  def _extractData(self, block: str, packet: Dict[str _ Element]):
     if "GPS" in block:
       self._extractGPS(block, packet)
     else:
       # find the first '[' and last ']'
       data_start = block.find('[')
       data_end = block.rfind(']')
-      data = block[data_start : data_end]
+      data = block[data_start _ data_end]
 
       # This will split on the common delimters found in DJIs srts and return a list
       # List _should_ be alternating keyword, value barring nothing weird from DJI

@@ -227,7 +227,7 @@ class ImageCoordinateSystemElement(Element, MISB_str):
 class LatitudeElement(Element, MISB_float):
   name = "latitude"
   names = {"Latitude", "latitude", "sensorLatitude", "SensorLatitude", "sensorlatitude",
-           "Sensor Latitude", "sensor latitude", "Lat", "lat", "LATITUDE", "LAT"}
+           "Sensor Latitude", "sensor latitude", "Lat", "lat", "LATITUDE", "LAT", "Lattitude", "lattitude"}
 
   misb_name = "Sensor Latitude"
   misb_key = "06 0E 2B 34 01 01 01 03 07 01 02 01 02 04 02 00"
